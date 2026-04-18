@@ -1,0 +1,16 @@
+{
+  "name": "aquachile-tech-quest",
+  "version": "1.0.0",
+  "description": "AquaChile Tech Quest - Juego estilo Mario Bros con temática tecnológica",
+  "scripts": {
+    "dev": "vite --port 3000",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "phaser": "^3.60.0"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0"
+  }
+}
