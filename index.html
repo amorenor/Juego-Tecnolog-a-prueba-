@@ -3,31 +3,1108 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AquaChile Tech Quest</title>
+  <title>Evaluación de Proyectos · Transformación Digital</title>
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --bg: #080f1a;
+      --surface: #0f1e30;
+      --surface2: #162840;
+      --surface3: #1e3350;
+      --primary: #0d5fa5;
+      --accent: #3b9eff;
+      --accent2: #7ecbff;
+      --success: #22c55e;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --gold: #fbbf24;
+      --silver: #cbd5e1;
+      --bronze: #d97706;
+      --text: #c8d8ec;
+      --text-bright: #eef4fd;
+      --text-muted: #6b8099;
+      --border: rgba(59,158,255,0.12);
+      --border2: rgba(255,255,255,0.07);
+      --glow: rgba(59,158,255,0.25);
+      --shadow: 0 4px 24px rgba(0,0,0,0.5);
+      --r: 14px;
+      --r-sm: 8px;
+    }
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
     body {
-      background: #0a0a1a;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
       min-height: 100vh;
-      overflow: hidden;
-      font-family: monospace;
+      line-height: 1.6;
     }
-    #game-container {
-      position: relative;
+
+    /* ── SCREENS ── */
+    .screen { display: none; min-height: 100vh; padding: 16px 16px 60px; }
+    .screen.active { display: block; }
+
+    .container { max-width: 820px; margin: 0 auto; }
+
+    /* ── APP HEADER ── */
+    .app-header {
+      text-align: center;
+      padding: 48px 0 36px;
     }
-    canvas {
-      image-rendering: pixelated;
-      image-rendering: crisp-edges;
+    .app-logo {
+      font-size: clamp(1.6rem, 5vw, 2.6rem);
+      font-weight: 900;
+      letter-spacing: -0.5px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 8px;
+    }
+    .app-tagline { color: var(--text-muted); font-size: 0.95rem; }
+
+    /* ── CARDS ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--r);
+      padding: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    /* ── BUTTONS ── */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 11px 22px;
+      border: none;
+      border-radius: var(--r-sm);
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.18s;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .btn:disabled { opacity: 0.4; pointer-events: none; }
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: #fff;
+    }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px var(--glow); }
+    .btn-success {
+      background: linear-gradient(135deg, #15803d, var(--success));
+      color: #fff;
+    }
+    .btn-success:hover { transform: translateY(-2px); box-shadow: 0 6px 18px rgba(34,197,94,0.35); }
+    .btn-danger {
+      background: linear-gradient(135deg, #b91c1c, var(--danger));
+      color: #fff;
+    }
+    .btn-danger:hover { transform: translateY(-2px); }
+    .btn-ghost {
+      background: var(--surface2);
+      color: var(--text);
+      border: 1px solid var(--border2);
+    }
+    .btn-ghost:hover { border-color: var(--accent); color: var(--accent); }
+    .btn-sm { padding: 7px 14px; font-size: 0.85rem; }
+    .btn-lg { padding: 14px 28px; font-size: 1.05rem; }
+    .btn-full { width: 100%; }
+
+    /* ── HOME SCREEN ── */
+    .home-actions {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-top: 28px;
+    }
+    .action-tile {
+      background: var(--surface);
+      border: 1px solid var(--border2);
+      border-radius: var(--r);
+      padding: 28px 20px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.22s;
+    }
+    .action-tile:hover {
+      border-color: var(--accent);
+      transform: translateY(-4px);
+      box-shadow: 0 10px 32px var(--glow);
+    }
+    .tile-icon { font-size: 2.6rem; margin-bottom: 12px; }
+    .tile-title { font-size: 1.1rem; font-weight: 700; color: var(--text-bright); margin-bottom: 6px; }
+    .tile-desc { font-size: 0.82rem; color: var(--text-muted); line-height: 1.4; }
+
+    /* ── ALERT ── */
+    .alert {
+      padding: 13px 16px;
+      border-radius: var(--r-sm);
+      font-size: 0.9rem;
+      margin-bottom: 16px;
+    }
+    .alert-info  { background: rgba(59,158,255,0.08); border: 1px solid rgba(59,158,255,0.25); color: var(--accent2); }
+    .alert-ok    { background: rgba(34,197,94,0.08); border: 1px solid rgba(34,197,94,0.25); color: #4ade80; }
+    .alert-warn  { background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.25); color: #fbbf24; }
+
+    /* ── PAGE HEADER ── */
+    .page-hdr {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 28px;
+      padding-top: 24px;
+    }
+    .page-hdr h2 { font-size: 1.3rem; color: var(--text-bright); font-weight: 700; }
+
+    /* ── FORMS ── */
+    .field { margin-bottom: 14px; }
+    .field label {
       display: block;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      margin-bottom: 6px;
+    }
+    .field input {
+      width: 100%;
+      padding: 11px 14px;
+      background: var(--surface2);
+      border: 1px solid var(--border2);
+      border-radius: var(--r-sm);
+      color: var(--text-bright);
+      font-size: 0.95rem;
+      transition: border-color 0.18s, box-shadow 0.18s;
+    }
+    .field input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(59,158,255,0.12);
+    }
+    .field input::placeholder { color: var(--text-muted); }
+
+    .grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .grid-auto { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 10px; }
+
+    /* ── SECTION LABEL ── */
+    .section-lbl {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
+      margin-bottom: 12px;
+      margin-top: 24px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .section-lbl::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+    /* ── JUROR SELECT ── */
+    .juror-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 14px;
+      margin-top: 20px;
+    }
+    .juror-tile {
+      background: var(--surface);
+      border: 2px solid var(--border2);
+      border-radius: var(--r);
+      padding: 24px 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .juror-tile:hover {
+      border-color: var(--accent);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 28px var(--glow);
+    }
+    .juror-tile.done { border-color: rgba(34,197,94,0.4); }
+    .juror-avatar {
+      width: 56px; height: 56px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      color: #fff;
+      font-size: 1.4rem;
+      font-weight: 800;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 12px;
+    }
+    .juror-tile h3 { color: var(--text-bright); font-size: 1rem; margin-bottom: 4px; }
+    .juror-tag { font-size: 0.78rem; color: var(--text-muted); }
+    .juror-tag.ok { color: var(--success); }
+
+    /* ── VOTE SCREEN ── */
+    .vote-hdr {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      padding-top: 20px;
+      margin-bottom: 20px;
+    }
+    .juror-pill {
+      background: rgba(59,158,255,0.1);
+      border: 1px solid rgba(59,158,255,0.3);
+      border-radius: 20px;
+      padding: 5px 14px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--accent);
+    }
+    .progress-wrap { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+    .progress-text { font-size: 0.78rem; color: var(--text-muted); }
+    .progress-bar {
+      width: 180px; height: 6px;
+      background: var(--surface3);
+      border-radius: 3px; overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), var(--accent));
+      border-radius: 3px;
+      transition: width 0.35s;
+    }
+
+    .project-banner {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-left: 4px solid var(--accent);
+      border-radius: var(--r);
+      padding: 16px 20px;
+      margin-bottom: 18px;
+    }
+    .project-num { font-size: 0.78rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.6px; }
+    .project-name-banner { font-size: 1.3rem; font-weight: 800; color: var(--text-bright); }
+
+    /* Dots */
+    .dots-row { display: flex; gap: 7px; flex-wrap: wrap; margin-bottom: 20px; }
+    .dot {
+      width: 11px; height: 11px;
+      border-radius: 50%;
+      background: var(--surface3);
+      cursor: pointer;
+      transition: all 0.18s;
+      flex-shrink: 0;
+    }
+    .dot.ok { background: var(--success); }
+    .dot.now { background: var(--accent); transform: scale(1.4); box-shadow: 0 0 6px var(--glow); }
+
+    /* Criteria */
+    .criteria-stack { display: flex; flex-direction: column; gap: 14px; }
+    .crit-card {
+      background: var(--surface);
+      border: 1px solid var(--border2);
+      border-radius: var(--r);
+      padding: 18px 20px;
+      transition: border-color 0.2s;
+    }
+    .crit-card.scored { border-color: rgba(59,158,255,0.3); }
+    .crit-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+    .crit-name { font-size: 0.95rem; font-weight: 700; color: var(--text-bright); }
+    .weight-badge {
+      flex-shrink: 0;
+      background: rgba(59,158,255,0.1);
+      color: var(--accent);
+      border: 1px solid rgba(59,158,255,0.25);
+      border-radius: 12px;
+      padding: 2px 9px;
+      font-size: 0.72rem;
+      font-weight: 800;
+    }
+    .crit-desc { font-size: 0.82rem; color: var(--text-muted); margin-bottom: 14px; }
+    .score-row { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+    .score-btn {
+      width: 50px; height: 50px;
+      border: 2px solid var(--border2);
+      border-radius: var(--r-sm);
+      background: var(--surface2);
+      color: var(--text-muted);
+      font-size: 1.1rem;
+      font-weight: 800;
+      cursor: pointer;
+      transition: all 0.15s;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .score-btn:hover { border-color: var(--accent); color: var(--accent); background: rgba(59,158,255,0.08); }
+    .score-btn.on {
+      border-color: var(--accent);
+      background: var(--accent);
+      color: #070f1a;
+      box-shadow: 0 0 14px var(--glow);
+      transform: scale(1.05);
+    }
+    .level-desc {
+      font-size: 0.83rem;
+      padding: 9px 13px;
+      background: var(--surface2);
+      border-radius: var(--r-sm);
+      border-left: 3px solid var(--accent);
+      color: var(--text);
+      min-height: 40px;
+    }
+    .level-desc.empty { color: var(--text-muted); font-style: italic; border-left-color: var(--border2); }
+
+    /* Nav */
+    .vote-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 22px;
+      padding-top: 20px;
+      border-top: 1px solid var(--border2);
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .vote-nav-center { font-size: 0.82rem; color: var(--text-muted); text-align: center; flex: 1; }
+    .submit-area { margin-top: 22px; }
+
+    /* ── SUBMITTED ── */
+    .submitted-wrap {
+      text-align: center;
+      padding: 60px 0 40px;
+    }
+    .big-icon { font-size: 4.5rem; margin-bottom: 20px; }
+    .summary-mini {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+      gap: 8px;
+      margin: 20px 0;
+      text-align: left;
+    }
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--surface2);
+      border-radius: var(--r-sm);
+      padding: 9px 13px;
+    }
+    .summary-pname { font-size: 0.85rem; color: var(--text); flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-right: 8px; }
+    .summary-pscore { font-size: 0.85rem; font-weight: 800; color: var(--accent); flex-shrink: 0; }
+
+    /* ── RESULTS ── */
+    .result-list { display: flex; flex-direction: column; gap: 12px; margin-top: 20px; }
+    .result-row {
+      background: var(--surface);
+      border: 1px solid var(--border2);
+      border-radius: var(--r);
+      padding: 18px 22px;
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      transition: transform 0.18s;
+    }
+    .result-row:hover { transform: translateX(4px); }
+    .r1 { border-left: 4px solid var(--gold); }
+    .r2 { border-left: 4px solid var(--silver); }
+    .r3 { border-left: 4px solid var(--bronze); }
+    .rank-num { font-size: 1.9rem; font-weight: 900; width: 48px; text-align: center; flex-shrink: 0; }
+    .r1 .rank-num { color: var(--gold); }
+    .r2 .rank-num { color: var(--silver); }
+    .r3 .rank-num { color: var(--bronze); }
+    .res-info { flex: 1; min-width: 0; }
+    .res-name { font-size: 1.05rem; font-weight: 700; color: var(--text-bright); margin-bottom: 5px; }
+    .chips { display: flex; flex-wrap: wrap; gap: 5px; }
+    .chip {
+      font-size: 0.72rem;
+      padding: 2px 8px;
+      background: var(--surface2);
+      border-radius: 10px;
+      color: var(--text-muted);
+    }
+    .res-score { text-align: right; flex-shrink: 0; }
+    .score-big { font-size: 2rem; font-weight: 900; color: var(--accent); line-height: 1; }
+    .score-of5 { font-size: 0.75rem; color: var(--text-muted); }
+    .mini-bar-wrap { width: 130px; height: 7px; background: var(--surface2); border-radius: 4px; overflow: hidden; margin-top: 6px; }
+    .mini-bar { height: 100%; background: linear-gradient(90deg, var(--primary), var(--accent)); border-radius: 4px; }
+
+    @keyframes pulse-gold { 0%,100%{transform:scale(1)} 50%{transform:scale(1.01)} }
+    .r1 { animation: pulse-gold 2.5s ease-in-out infinite; }
+
+    /* Detail table */
+    .detail-table { width: 100%; border-collapse: collapse; font-size: 0.83rem; margin-top: 14px; }
+    .detail-table th {
+      background: var(--surface2);
+      padding: 9px 10px;
+      text-align: left;
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .detail-table td { padding: 9px 10px; border-bottom: 1px solid var(--border2); }
+    .detail-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+    /* Juror status pills */
+    .j-pills { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
+    .j-pill {
+      display: flex; align-items: center; gap: 6px;
+      padding: 5px 14px;
+      background: var(--surface);
+      border: 1px solid var(--border2);
+      border-radius: 20px;
+      font-size: 0.82rem;
+    }
+    .j-pill.voted { border-color: rgba(34,197,94,0.4); }
+
+    /* ── TOAST ── */
+    #toast {
+      position: fixed; top: 20px; right: 20px;
+      padding: 13px 20px;
+      border-radius: var(--r-sm);
+      font-weight: 600; font-size: 0.9rem;
+      color: #fff;
+      z-index: 9999;
+      box-shadow: 0 6px 24px rgba(0,0,0,0.4);
+      opacity: 0;
+      transform: translateY(-8px);
+      transition: all 0.25s;
+      pointer-events: none;
+    }
+    #toast.show { opacity: 1; transform: translateY(0); }
+    #toast.ok  { background: #16a34a; }
+    #toast.err { background: #dc2626; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 580px) {
+      .grid-3 { grid-template-columns: 1fr; }
+      .juror-grid { grid-template-columns: 1fr; }
+      .score-btn { width: 44px; height: 44px; font-size: 1rem; }
+      .mini-bar-wrap { display: none; }
+      .chips { display: none; }
     }
   </style>
 </head>
 <body>
-  <div id="game-container"></div>
-  <script type="module" src="/src/main.js"></script>
+
+<!-- ════════════════════════════════════════
+     HOME
+════════════════════════════════════════ -->
+<div id="s-home" class="screen active">
+  <div class="container">
+    <div class="app-header">
+      <div class="app-logo">🏆 Evaluación de Proyectos</div>
+      <div class="app-tagline">Sistema de votación para jurado · Transformación Digital</div>
+    </div>
+
+    <div id="home-alert"></div>
+
+    <div class="home-actions">
+      <div class="action-tile" onclick="openSetup()">
+        <div class="tile-icon">⚙️</div>
+        <div class="tile-title">Configurar</div>
+        <div class="tile-desc">Nombres de proyectos y jurados</div>
+      </div>
+      <div class="action-tile" onclick="openJurorSelect()">
+        <div class="tile-icon">🗳️</div>
+        <div class="tile-title">Votar</div>
+        <div class="tile-desc">Evaluación con rúbrica 1–5</div>
+      </div>
+      <div class="action-tile" onclick="openResults()">
+        <div class="tile-icon">📊</div>
+        <div class="tile-title">Resultados</div>
+        <div class="tile-desc">Ranking del 1 al 9</div>
+      </div>
+    </div>
+
+    <div style="margin-top:40px;text-align:center;">
+      <button class="btn btn-danger btn-sm" onclick="doReset()">🗑️ Borrar todos los votos</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     SETUP
+════════════════════════════════════════ -->
+<div id="s-setup" class="screen">
+  <div class="container">
+    <div class="page-hdr">
+      <button class="btn btn-ghost btn-sm" onclick="go('s-home')">← Volver</button>
+      <h2>⚙️ Configuración</h2>
+    </div>
+
+    <div class="card" style="margin-bottom:20px;">
+      <div class="section-lbl">👥 Nombres de los Jurados</div>
+      <div class="grid-3" id="juror-inputs"></div>
+    </div>
+
+    <div class="card">
+      <div class="section-lbl">📋 Nombres de los Proyectos</div>
+      <div class="grid-auto" id="project-inputs"></div>
+    </div>
+
+    <div style="display:flex;gap:12px;justify-content:flex-end;margin-top:22px;flex-wrap:wrap;">
+      <button class="btn btn-ghost" onclick="go('s-home')">Cancelar</button>
+      <button class="btn btn-success btn-lg" onclick="saveSetup()">💾 Guardar configuración</button>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     JUROR SELECT
+════════════════════════════════════════ -->
+<div id="s-jurors" class="screen">
+  <div class="container">
+    <div class="page-hdr">
+      <button class="btn btn-ghost btn-sm" onclick="go('s-home')">← Volver</button>
+      <h2>🗳️ ¿Quién vota?</h2>
+    </div>
+    <p style="color:var(--text-muted);font-size:0.9rem;margin-bottom:4px;">Selecciona tu identidad para comenzar la evaluación:</p>
+    <div class="juror-grid" id="juror-cards"></div>
+    <div class="alert alert-info" style="margin-top:22px;">
+      ℹ️ Puedes re-abrir y modificar tus evaluaciones antes de consultar los resultados finales.
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     VOTING
+════════════════════════════════════════ -->
+<div id="s-vote" class="screen">
+  <div class="container">
+    <div class="vote-hdr">
+      <button class="btn btn-ghost btn-sm" onclick="leaveVote()">← Salir</button>
+      <div class="juror-pill" id="v-juror-pill"></div>
+      <div class="progress-wrap">
+        <span class="progress-text" id="v-prog-text"></span>
+        <div class="progress-bar"><div class="progress-fill" id="v-prog-fill"></div></div>
+      </div>
+    </div>
+
+    <div class="project-banner">
+      <div class="project-num" id="v-proj-num"></div>
+      <div class="project-name-banner" id="v-proj-name"></div>
+    </div>
+
+    <div class="dots-row" id="v-dots"></div>
+
+    <div class="criteria-stack" id="v-criteria"></div>
+
+    <div class="vote-nav">
+      <button class="btn btn-ghost" id="btn-prev" onclick="navProject(-1)">← Anterior</button>
+      <div class="vote-nav-center" id="v-status"></div>
+      <button class="btn btn-primary" id="btn-next" onclick="navProject(1)">Siguiente →</button>
+    </div>
+
+    <div class="submit-area">
+      <button class="btn btn-success btn-lg btn-full" id="btn-submit" onclick="submitVotes()" disabled>
+        ✅ Enviar evaluación
+      </button>
+      <p style="text-align:center;font-size:0.8rem;color:var(--text-muted);margin-top:7px;" id="v-submit-hint"></p>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     SUBMITTED
+════════════════════════════════════════ -->
+<div id="s-submitted" class="screen">
+  <div class="container">
+    <div class="submitted-wrap">
+      <div class="big-icon">✅</div>
+      <h2 style="color:var(--success);margin-bottom:8px;" id="sub-title"></h2>
+      <p style="color:var(--text-muted);margin-bottom:28px;" id="sub-sub"></p>
+
+      <div class="card" style="text-align:left;margin-bottom:24px;">
+        <div class="section-lbl">📋 Resumen de tu evaluación</div>
+        <div class="summary-mini" id="sub-summary"></div>
+      </div>
+
+      <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
+        <button class="btn btn-ghost" onclick="go('s-home')">🏠 Inicio</button>
+        <button class="btn btn-primary" onclick="openResults()">📊 Ver resultados</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════
+     RESULTS
+════════════════════════════════════════ -->
+<div id="s-results" class="screen">
+  <div class="container">
+    <div class="page-hdr">
+      <button class="btn btn-ghost btn-sm" onclick="go('s-home')">← Volver</button>
+      <h2>📊 Resultados Finales</h2>
+    </div>
+
+    <div class="j-pills" id="res-juror-pills"></div>
+
+    <div id="res-main"></div>
+
+    <div style="margin-top:36px;padding-top:24px;border-top:1px solid var(--border2);">
+      <div class="section-lbl">📋 Detalle por proyecto y criterio</div>
+      <div style="overflow-x:auto;" id="res-detail"></div>
+    </div>
+
+    <div style="margin-top:28px;text-align:center;">
+      <button class="btn btn-primary btn-lg" onclick="openResults()">🔄 Actualizar resultados</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+<script>
+/* ═══════════════════════════════════════════
+   DATA & RUBRIC
+═══════════════════════════════════════════ */
+const CRITERIA = [
+  {
+    id:'c1', weight:0.10,
+    name:'Alineamiento Estratégico de Transformación Digital',
+    desc:'¿Qué tan bien responde a la transformación Digital (automatización digital, uso de datos, eficiencia operacional)?',
+    levels:{
+      1:'No se relaciona con ningún pilar de la TD.',
+      2:'Relación débil o solo declarativa con lo digital.',
+      3:'Alineamiento parcial: digitaliza o mejora solo una parte del proceso.',
+      4:'Alineamiento claro: contribuye directamente a un pilar digital definido.',
+      5:'Alineamiento total: proyecto referente o habilitador clave de la transformación digital.'
+    }
+  },
+  {
+    id:'c2', weight:0.35,
+    name:'Impacto Operacional y/o Económico Potencial',
+    desc:'Capacidad de la solución para generar mejoras medibles en eficiencia, costos, productividad, calidad, seguridad o continuidad operacional.',
+    levels:{
+      1:'No se identifica impacto claro o medible.',
+      2:'Impacto indirecto o solo cualitativo (orden, visibilidad).',
+      3:'Impacto local en un proceso, turno o equipo específico.',
+      4:'Impacto alto en una planta, línea o área completa.',
+      5:'Impacto crítico o transversal con potencial de ahorro o mejora significativas a nivel empresa.'
+    }
+  },
+  {
+    id:'c3', weight:0.20,
+    name:'Factibilidad Técnica y Operativa',
+    desc:'Qué tan viable es implementar la solución considerando tecnologías disponibles.',
+    levels:{
+      1:'No es viable con la infraestructura actual.',
+      2:'Alta complejidad técnica o dependencia externa crítica.',
+      3:'Factible, pero requiere ajustes relevantes.',
+      4:'Factible con tecnologías existentes.',
+      5:'Implementación inmediata o de rápida ejecución.'
+    }
+  },
+  {
+    id:'c4', weight:0.10,
+    name:'Nivel de Digitalización',
+    desc:'Grado en que la solución incorpora tecnologías digitales.',
+    levels:{
+      1:'No incorpora tecnología digital nueva.',
+      2:'Uso básico de herramientas digitales ya existentes.',
+      3:'Mejora digital relevante respecto a la situación actual.',
+      4:'Solución digital nueva para el área o planta.',
+      5:'Uso avanzado o diferenciador de tecnología digital.'
+    }
+  },
+  {
+    id:'c5', weight:0.25,
+    name:'Escalabilidad y Replicabilidad',
+    desc:'Facilidad para replicar la solución en otras áreas, plantas, líneas productivas o procesos similares.',
+    levels:{
+      1:'Solución muy específica, no replicable.',
+      2:'Replicable solo en condiciones muy similares.',
+      3:'Replicable en procesos similares dentro de una misma planta.',
+      4:'Replicable en varias plantas o áreas operativas.',
+      5:'Solución estándar o plataforma digital escalable a nivel corporativo.'
+    }
+  }
+];
+
+const DEF_JURORS   = [{id:'j1',name:'Jurado 1'},{id:'j2',name:'Jurado 2'},{id:'j3',name:'Jurado 3'}];
+const DEF_PROJECTS = Array.from({length:9},(_,i)=>({id:i+1,name:`Proyecto ${i+1}`}));
+
+/* ═══════════════════════════════════════════
+   STORAGE HELPERS
+═══════════════════════════════════════════ */
+const ls = {
+  get: k => { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } },
+  set: (k,v) => localStorage.setItem(k, JSON.stringify(v)),
+  del: k => localStorage.removeItem(k)
+};
+const getProjects = () => ls.get('vp_projects') || DEF_PROJECTS;
+const getJurors   = () => ls.get('vp_jurors')   || DEF_JURORS;
+const getVotes    = id  => ls.get(`vp_votes_${id}`);
+const setVotes    = (id,v) => ls.set(`vp_votes_${id}`, v);
+
+/* ═══════════════════════════════════════════
+   STATE
+═══════════════════════════════════════════ */
+let S = { jurorId: null, projIdx: 0, tmp: {} };
+
+/* ═══════════════════════════════════════════
+   NAVIGATION
+═══════════════════════════════════════════ */
+function go(screenId) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(screenId).classList.add('active');
+  window.scrollTo(0,0);
+  if (screenId === 's-home') renderHomeAlert();
+}
+
+/* ═══════════════════════════════════════════
+   TOAST
+═══════════════════════════════════════════ */
+function toast(msg, type='ok') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = `show ${type}`;
+  clearTimeout(t._to);
+  t._to = setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+/* ═══════════════════════════════════════════
+   HOME
+═══════════════════════════════════════════ */
+function renderHomeAlert() {
+  const jurors = getJurors();
+  const voted  = jurors.filter(j => getVotes(j.id) !== null).length;
+  const el = document.getElementById('home-alert');
+  if (voted === 0) {
+    el.innerHTML = `<div class="alert alert-info">👋 Configura los nombres y luego cada jurado puede votar desde esta pantalla.</div>`;
+  } else if (voted < 3) {
+    el.innerHTML = `<div class="alert alert-warn">⏳ ${voted} de 3 jurados han enviado su evaluación. Esperando los demás...</div>`;
+  } else {
+    el.innerHTML = `<div class="alert alert-ok">✅ ¡Los 3 jurados han votado! Consulta los resultados.</div>`;
+  }
+}
+
+/* ═══════════════════════════════════════════
+   SETUP
+═══════════════════════════════════════════ */
+function openSetup() {
+  const jurors   = getJurors();
+  const projects = getProjects();
+
+  document.getElementById('juror-inputs').innerHTML =
+    jurors.map((j,i) => `
+      <div class="field">
+        <label>Jurado ${i+1}</label>
+        <input type="text" id="ji-${i}" value="${esc(j.name)}" placeholder="Nombre del jurado ${i+1}">
+      </div>`).join('');
+
+  document.getElementById('project-inputs').innerHTML =
+    projects.map((p,i) => `
+      <div class="field">
+        <label>Proyecto ${i+1}</label>
+        <input type="text" id="pi-${i}" value="${esc(p.name)}" placeholder="Nombre del proyecto ${i+1}">
+      </div>`).join('');
+
+  go('s-setup');
+}
+
+function saveSetup() {
+  const jurors   = getJurors().map((j,i) => ({ ...j, name: val(`ji-${i}`) || `Jurado ${i+1}` }));
+  const projects = getProjects().map((p,i) => ({ ...p, name: val(`pi-${i}`) || `Proyecto ${i+1}` }));
+  ls.set('vp_jurors',   jurors);
+  ls.set('vp_projects', projects);
+  toast('✅ Configuración guardada');
+  go('s-home');
+}
+
+/* ═══════════════════════════════════════════
+   JUROR SELECT
+═══════════════════════════════════════════ */
+function openJurorSelect() {
+  const jurors = getJurors();
+  document.getElementById('juror-cards').innerHTML = jurors.map(j => {
+    const voted = getVotes(j.id) !== null;
+    return `
+      <div class="juror-tile ${voted?'done':''}" onclick="startVoting('${j.id}')">
+        <div class="juror-avatar">${j.name.charAt(0).toUpperCase()}</div>
+        <h3>${esc(j.name)}</h3>
+        <div class="juror-tag ${voted?'ok':''}">${voted ? '✅ Evaluación enviada' : '⏳ Pendiente'}</div>
+      </div>`;
+  }).join('');
+  go('s-jurors');
+}
+
+/* ═══════════════════════════════════════════
+   VOTING
+═══════════════════════════════════════════ */
+function startVoting(jurorId) {
+  S.jurorId  = jurorId;
+  S.projIdx  = 0;
+  const saved = getVotes(jurorId);
+  S.tmp = saved ? JSON.parse(JSON.stringify(saved.scores)) : {};
+  renderVote();
+  go('s-vote');
+}
+
+function renderVote() {
+  const projects = getProjects();
+  const jurors   = getJurors();
+  const juror    = jurors.find(j => j.id === S.jurorId);
+  const proj     = projects[S.projIdx];
+  const scores   = S.tmp[proj.id] || {};
+
+  // header
+  document.getElementById('v-juror-pill').textContent = `🎯 ${juror.name}`;
+  document.getElementById('v-proj-num').textContent   = `Proyecto ${S.projIdx+1} de ${projects.length}`;
+  document.getElementById('v-proj-name').textContent  = proj.name;
+  document.getElementById('v-prog-text').textContent  = `${S.projIdx+1} / ${projects.length}`;
+  document.getElementById('v-prog-fill').style.width  = `${((S.projIdx+1)/projects.length)*100}%`;
+
+  // dots
+  document.getElementById('v-dots').innerHTML = projects.map((p,i) => {
+    const ok = isComplete(p.id);
+    const now = i === S.projIdx;
+    return `<div class="dot ${ok?'ok':''} ${now?'now':''}" onclick="jumpTo(${i})" title="${esc(p.name)}"></div>`;
+  }).join('');
+
+  // criteria
+  document.getElementById('v-criteria').innerHTML = CRITERIA.map(c => {
+    const score = scores[c.id] || 0;
+    return `
+      <div class="crit-card ${score?'scored':''}" id="cc-${c.id}">
+        <div class="crit-top">
+          <div class="crit-name">${c.name}</div>
+          <div class="weight-badge">${Math.round(c.weight*100)}%</div>
+        </div>
+        <div class="crit-desc">${c.desc}</div>
+        <div class="score-row">
+          ${[1,2,3,4,5].map(n => `
+            <button class="score-btn ${score===n?'on':''}" onclick="setScore('${c.id}',${n})">${n}</button>
+          `).join('')}
+        </div>
+        <div class="level-desc ${!score?'empty':''}" id="ld-${c.id}">
+          ${score ? `<strong>${score}:</strong> ${c.levels[score]}` : 'Selecciona una puntuación (1 = menor, 5 = mayor)'}
+        </div>
+      </div>`;
+  }).join('');
+
+  // navigation
+  document.getElementById('btn-prev').disabled = S.projIdx === 0;
+  document.getElementById('btn-next').style.display = S.projIdx < projects.length-1 ? '' : 'none';
+
+  updateSubmitBtn();
+}
+
+function setScore(critId, n) {
+  const proj = getProjects()[S.projIdx];
+  if (!S.tmp[proj.id]) S.tmp[proj.id] = {};
+  S.tmp[proj.id][critId] = n;
+
+  // update card
+  const card = document.getElementById(`cc-${critId}`);
+  card.classList.add('scored');
+  card.querySelectorAll('.score-btn').forEach(b => b.classList.toggle('on', +b.textContent === n));
+  const ld = document.getElementById(`ld-${critId}`);
+  ld.classList.remove('empty');
+  const crit = CRITERIA.find(c=>c.id===critId);
+  ld.innerHTML = `<strong>${n}:</strong> ${crit.levels[n]}`;
+
+  // refresh dot
+  const dots = document.querySelectorAll('#v-dots .dot');
+  dots[S.projIdx].classList.toggle('ok', isComplete(proj.id));
+
+  updateSubmitBtn();
+}
+
+function isComplete(projId) {
+  const s = S.tmp[projId] || {};
+  return CRITERIA.every(c => s[c.id] > 0);
+}
+
+function countComplete() {
+  return getProjects().filter(p => isComplete(p.id)).length;
+}
+
+function updateSubmitBtn() {
+  const total  = getProjects().length;
+  const done   = countComplete();
+  const allOk  = done === total;
+  document.getElementById('btn-submit').disabled = !allOk;
+  document.getElementById('btn-submit').style.opacity = allOk ? '1' : '0.45';
+  document.getElementById('v-status').textContent = `${done}/${total} proyectos completados`;
+  document.getElementById('v-submit-hint').textContent = allOk
+    ? '¡Listo para enviar tu evaluación!'
+    : `Faltan ${total-done} proyectos por puntuar`;
+}
+
+function navProject(dir) {
+  const projects = getProjects();
+  const nxt = S.projIdx + dir;
+  if (nxt >= 0 && nxt < projects.length) { S.projIdx = nxt; renderVote(); window.scrollTo(0,0); }
+}
+
+function jumpTo(idx) { S.projIdx = idx; renderVote(); window.scrollTo(0,0); }
+
+function leaveVote() { go('s-jurors'); openJurorSelect(); }
+
+function submitVotes() {
+  const projects = getProjects();
+  if (countComplete() < projects.length) {
+    toast('Completa todos los proyectos antes de enviar', 'err');
+    return;
+  }
+  const juror = getJurors().find(j=>j.id===S.jurorId);
+  setVotes(S.jurorId, { jurorId:S.jurorId, jurorName:juror.name, ts:new Date().toISOString(), scores:S.tmp });
+
+  // submitted screen
+  document.getElementById('sub-title').textContent = `¡Evaluación de ${juror.name} enviada!`;
+  document.getElementById('sub-sub').textContent   = `Registrada el ${new Date().toLocaleString('es-CL')}`;
+  document.getElementById('sub-summary').innerHTML = projects.map(p => {
+    const s = S.tmp[p.id] || {};
+    const w = CRITERIA.reduce((acc,c) => acc + (s[c.id]||0)*c.weight, 0);
+    return `<div class="summary-row">
+      <span class="summary-pname">${esc(p.name)}</span>
+      <span class="summary-pscore">${w.toFixed(2)}</span>
+    </div>`;
+  }).join('');
+
+  go('s-submitted');
+  renderHomeAlert();
+}
+
+/* ═══════════════════════════════════════════
+   RESULTS
+═══════════════════════════════════════════ */
+function openResults() {
+  const projects = getProjects();
+  const jurors   = getJurors();
+
+  // juror pills
+  document.getElementById('res-juror-pills').innerHTML = jurors.map(j => {
+    const voted = getVotes(j.id) !== null;
+    return `<div class="j-pill ${voted?'voted':''}">
+      ${voted?'✅':'⏳'} <span style="color:${voted?'var(--success)':'var(--text-muted)'};">${esc(j.name)}</span>
+    </div>`;
+  }).join('');
+
+  // calc scores
+  const activeJurors = jurors.filter(j => getVotes(j.id));
+  const ranked = projects.map(proj => {
+    let totalW = 0, cnt = 0;
+    const cAvg = {};
+    CRITERIA.forEach(c => cAvg[c.id] = 0);
+
+    activeJurors.forEach(j => {
+      const v = getVotes(j.id);
+      const s = v.scores[proj.id] || {};
+      if (CRITERIA.every(c => s[c.id])) {
+        totalW += CRITERIA.reduce((acc,c) => acc + s[c.id]*c.weight, 0);
+        CRITERIA.forEach(c => cAvg[c.id] += s[c.id]);
+        cnt++;
+      }
+    });
+
+    const avg = cnt ? totalW/cnt : 0;
+    if (cnt) CRITERIA.forEach(c => cAvg[c.id] /= cnt);
+
+    return { proj, avg, cAvg, cnt, total: activeJurors.length };
+  }).sort((a,b) => b.avg - a.avg);
+
+  // main list
+  const medals = ['🥇','🥈','🥉','4','5','6','7','8','9'];
+  const rankCls = i => i===0?'r1':i===1?'r2':i===2?'r3':'';
+
+  if (!activeJurors.length) {
+    document.getElementById('res-main').innerHTML =
+      `<div class="alert alert-warn">⏳ Aún no hay evaluaciones registradas.</div>`;
+  } else {
+    document.getElementById('res-main').innerHTML = `
+      <div class="result-list">
+        ${ranked.map((r,i) => `
+          <div class="result-row ${rankCls(i)}">
+            <div class="rank-num">${medals[i]}</div>
+            <div class="res-info">
+              <div class="res-name">${esc(r.proj.name)}</div>
+              <div class="chips">
+                ${CRITERIA.map(c=>`<div class="chip">${shortName(c.name)}: ${r.cAvg[c.id].toFixed(1)}</div>`).join('')}
+              </div>
+            </div>
+            <div class="res-score">
+              <div class="score-big">${r.avg.toFixed(2)}</div>
+              <div class="score-of5">/ 5.00</div>
+              <div class="mini-bar-wrap"><div class="mini-bar" style="width:${(r.avg/5)*100}%"></div></div>
+              ${r.cnt < r.total ? `<div style="font-size:0.7rem;color:var(--text-muted);margin-top:3px;">${r.cnt}/${r.total} jurados</div>` : ''}
+            </div>
+          </div>`).join('')}
+      </div>`;
+  }
+
+  // detail table
+  if (activeJurors.length) {
+    document.getElementById('res-detail').innerHTML = `
+      <table class="detail-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Proyecto</th>
+            ${CRITERIA.map(c=>`<th title="${c.name}">${shortName(c.name)}<br><small style="color:var(--text-muted)">${Math.round(c.weight*100)}%</small></th>`).join('')}
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${ranked.map((r,i)=>`
+            <tr>
+              <td style="color:var(--accent);font-weight:700;">${i+1}</td>
+              <td style="font-weight:600;">${esc(r.proj.name)}</td>
+              ${CRITERIA.map(c=>`<td style="text-align:center;">${r.cAvg[c.id].toFixed(1)}</td>`).join('')}
+              <td style="text-align:center;font-weight:800;color:var(--accent);">${r.avg.toFixed(2)}</td>
+            </tr>`).join('')}
+        </tbody>
+      </table>`;
+  } else {
+    document.getElementById('res-detail').innerHTML = '';
+  }
+
+  go('s-results');
+}
+
+/* ═══════════════════════════════════════════
+   RESET
+═══════════════════════════════════════════ */
+function doReset() {
+  if (!confirm('¿Borrar TODOS los votos registrados? Los nombres de proyectos y jurados se conservarán.')) return;
+  getJurors().forEach(j => ls.del(`vp_votes_${j.id}`));
+  toast('🗑️ Votos borrados');
+  renderHomeAlert();
+}
+
+/* ═══════════════════════════════════════════
+   UTILS
+═══════════════════════════════════════════ */
+function esc(s) {
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+function val(id) { return document.getElementById(id)?.value.trim() || ''; }
+function shortName(name) {
+  const map = {
+    'Alineamiento':'Alinea.',
+    'Impacto':'Impacto',
+    'Factibilidad':'Factibil.',
+    'Nivel':'Digital.',
+    'Escalabilidad':'Escala.'
+  };
+  const first = name.split(' ')[0];
+  return map[first] || first;
+}
+
+/* ═══════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════ */
+renderHomeAlert();
+</script>
 </body>
 </html>
