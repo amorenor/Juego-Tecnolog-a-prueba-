@@ -161,6 +161,19 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica N
 .search-bar input{flex:1;padding:10px 14px;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--r-sm);color:var(--text-bright);font-size:0.9rem;}
 .search-bar input:focus{outline:none;border-color:var(--accent);}
 
+/* NEWS FEED */
+.news-section{margin-bottom:28px;}
+.news-item{display:flex;align-items:flex-start;gap:12px;padding:12px 14px;border-radius:var(--r-sm);margin-bottom:8px;}
+.news-success{background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);}
+.news-warning{background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);}
+.news-danger{background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);}
+.news-info{background:rgba(59,158,255,0.08);border:1px solid rgba(59,158,255,0.15);}
+.news-icon{font-size:1.2rem;flex-shrink:0;margin-top:1px;}
+.news-title{font-size:0.88rem;font-weight:600;color:var(--text-bright);}
+.news-desc{font-size:0.78rem;color:var(--text-muted);margin-top:2px;}
+.news-empty{text-align:center;padding:14px;font-size:0.85rem;color:var(--text-muted);background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);}
+.news-date{font-size:0.72rem;color:var(--text-muted);margin-bottom:10px;text-align:right;}
+
 /* TOAST */
 .toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--surface3);border:1px solid var(--border);border-radius:var(--r-sm);padding:10px 20px;font-size:0.88rem;color:var(--text-bright);opacity:0;transition:all .3s;z-index:300;pointer-events:none;white-space:nowrap;}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
@@ -186,6 +199,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica N
   </div>
 
   <div class="stats-row" id="home-stats"></div>
+
+  <div class="news-section">
+    <div class="section-lbl">Novedades del día</div>
+    <div class="news-date" id="news-date"></div>
+    <div id="news-container"></div>
+  </div>
 
   <div class="page-hdr">
     <h2>Equipos</h2>
@@ -493,6 +512,7 @@ function renderHome() {
     a + (e.objetivos||[]).filter(o=>o.estado==='Pendiente').length +
         (e.capacitaciones||[]).filter(c=>c.estado==='Pendiente').length, 0);
 
+  renderNews();
   document.getElementById('home-stats').innerHTML = `
     <div class="stat-box"><div class="stat-val">${db.teams.length}</div><div class="stat-lbl">Equipos</div></div>
     <div class="stat-box"><div class="stat-val">${totalEmp}</div><div class="stat-lbl">Personas</div></div>
@@ -957,6 +977,124 @@ function closeModal(id) { document.getElementById(id).classList.remove('open'); 
 document.querySelectorAll('.modal-overlay').forEach(o => {
   o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); });
 });
+
+// ── NEWS FEED ─────────────────────────────────────────────────────────────────
+function daysUntilDate(month, day, today) {
+  const thisYear = new Date(today.getFullYear(), month, day);
+  let diff = Math.round((thisYear - today) / (1000*60*60*24));
+  if (diff < 0) {
+    const nextYear = new Date(today.getFullYear()+1, month, day);
+    diff = Math.round((nextYear - today) / (1000*60*60*24));
+  }
+  return diff;
+}
+
+function renderNews() {
+  const today = new Date();
+  today.setHours(0,0,0,0);
+  const todayStr = today.toISOString().split('T')[0];
+
+  const DAYS_AHEAD = 7;
+  const news = [];
+  const recs = [];
+
+  db.employees.forEach(emp => {
+    const name = `${emp.nombre} ${emp.apellido}`;
+    const team = db.teams.find(t => t.id === emp.teamId);
+    const teamName = team ? team.name : '';
+
+    // 🎂 Cumpleaños
+    if (emp.nacimiento) {
+      const born = new Date(emp.nacimiento + 'T00:00:00');
+      const age = today.getFullYear() - born.getFullYear();
+      const d = daysUntilDate(born.getMonth(), born.getDate(), today);
+      if (d === 0)
+        news.push({ p:1, color:'success', icon:'🎂', title:`¡Hoy es el cumpleaños de ${name}!`, desc:`Cumple ${age} años · ${teamName}` });
+      else if (d <= DAYS_AHEAD)
+        news.push({ p:3, color:'info', icon:'🎂', title:`Cumpleaños próximo: ${name}`, desc:`En ${d} día${d>1?'s':''} cumple ${age} años · ${teamName}` });
+    }
+
+    // 🏆 Aniversario laboral
+    if (emp.ingreso) {
+      const start = new Date(emp.ingreso + 'T00:00:00');
+      const years = today.getFullYear() - start.getFullYear();
+      if (years > 0) {
+        const d = daysUntilDate(start.getMonth(), start.getDate(), today);
+        if (d === 0)
+          news.push({ p:1, color:'success', icon:'🏆', title:`¡Aniversario laboral de ${name}!`, desc:`Hoy cumple ${years} año${years>1?'s':''} en AquaChile · ${teamName}` });
+        else if (d <= DAYS_AHEAD)
+          news.push({ p:3, color:'info', icon:'🏆', title:`Aniversario próximo: ${name}`, desc:`En ${d} día${d>1?'s':''} cumple ${years} año${years>1?'s':''} en la empresa · ${teamName}` });
+      }
+    }
+
+    // 📅 Conversación 1:1 programada para hoy
+    (emp.conversaciones||[]).forEach(c => {
+      if (c.proximaFecha === todayStr)
+        news.push({ p:1, color:'warning', icon:'📅', title:`Conversación 1:1 programada hoy con ${name}`, desc:`Tipo: ${c.tipo||'1:1'} · ${teamName}` });
+    });
+
+    // ⚠️ Objetivos vencidos o por vencer
+    (emp.objetivos||[]).forEach(obj => {
+      if (!obj.fechaLimite || obj.estado === 'Completado' || obj.estado === 'Cancelado') return;
+      const due = new Date(obj.fechaLimite + 'T00:00:00');
+      const diff = Math.round((due - today) / (1000*60*60*24));
+      if (diff < 0)
+        news.push({ p:1, color:'danger', icon:'⚠️', title:`Objetivo vencido: ${name}`, desc:`"${obj.titulo}" · venció hace ${Math.abs(diff)} día${Math.abs(diff)>1?'s':''}` });
+      else if (diff === 0)
+        news.push({ p:1, color:'warning', icon:'📋', title:`Objetivo vence hoy: ${name}`, desc:`"${obj.titulo}"` });
+      else if (diff <= DAYS_AHEAD)
+        news.push({ p:2, color:'warning', icon:'📋', title:`Objetivo por vencer: ${name}`, desc:`"${obj.titulo}" · vence en ${diff} días` });
+    });
+
+    // 📚 Capacitaciones por terminar
+    (emp.capacitaciones||[]).forEach(cap => {
+      if (!cap.fechaFin || cap.estado === 'Completado' || cap.estado === 'Cancelado') return;
+      const due = new Date(cap.fechaFin + 'T00:00:00');
+      const diff = Math.round((due - today) / (1000*60*60*24));
+      if (diff === 0)
+        news.push({ p:2, color:'info', icon:'📚', title:`Capacitación finaliza hoy: ${name}`, desc:`"${cap.nombre}"` });
+      else if (diff < 0 && cap.estado === 'En curso')
+        news.push({ p:2, color:'warning', icon:'📚', title:`Capacitación vencida: ${name}`, desc:`"${cap.nombre}" debería haber terminado hace ${Math.abs(diff)} días` });
+    });
+
+    // 💬 Recomendación de reunión
+    const convs = emp.conversaciones || [];
+    if (convs.length === 0) {
+      recs.push({ p:5, color:'info', icon:'💬', title:`Recomendación: agenda una 1:1 con ${name}`, desc:`Sin conversaciones registradas · ${teamName}` });
+    } else {
+      const last = convs.filter(c=>c.fecha).sort((a,b)=>b.fecha.localeCompare(a.fecha))[0];
+      if (last) {
+        const lastDate = new Date(last.fecha + 'T00:00:00');
+        const daysSince = Math.round((today - lastDate) / (1000*60*60*24));
+        if (daysSince >= 30)
+          recs.push({ p:4, color:'info', icon:'💬', title:`Recomendación: reunirse con ${name}`, desc:`Hace ${daysSince} días sin conversación registrada · ${teamName}` });
+      }
+    }
+  });
+
+  // Añadir máx. 3 recomendaciones ordenadas por días sin conversación
+  recs.slice(0, 3).forEach(r => news.push(r));
+  news.sort((a,b) => a.p - b.p);
+
+  const dias = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+  const meses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  document.getElementById('news-date').textContent =
+    `${dias[today.getDay()]} ${today.getDate()} de ${meses[today.getMonth()]} de ${today.getFullYear()}`;
+
+  const container = document.getElementById('news-container');
+  if (!news.length) {
+    container.innerHTML = `<div class="news-empty">✓ Sin eventos relevantes para hoy. ¡Buen día!</div>`;
+    return;
+  }
+  container.innerHTML = news.slice(0,12).map(n => `
+    <div class="news-item news-${n.color}">
+      <span class="news-icon">${n.icon}</span>
+      <div class="news-content">
+        <div class="news-title">${n.title}</div>
+        <div class="news-desc">${n.desc}</div>
+      </div>
+    </div>`).join('');
+}
 
 // ── UTILS ─────────────────────────────────────────────────────────────────────
 function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
