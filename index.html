@@ -82,6 +82,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica N
 .badge-pending{background:rgba(245,158,11,0.15);color:var(--warning);}
 .badge-ok{background:rgba(34,197,94,0.12);color:var(--success);}
 .badge-info{background:rgba(59,158,255,0.12);color:var(--accent);}
+.badge-leader{background:rgba(251,191,36,0.15);color:#fbbf24;}
+.member-leader{border-color:rgba(251,191,36,0.4);}
+.member-leader .avatar{background:linear-gradient(135deg,#b45309,#fbbf24);}
 
 /* EMPLOYEE PROFILE TABS */
 .profile-hero{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:24px;display:flex;align-items:center;gap:20px;margin-bottom:20px;}
@@ -312,7 +315,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica N
         <option value="#ef4444">Rojo</option>
       </select>
     </div>
-    <div class="field"><label>Líder / Jefe de equipo</label><input type="text" id="team-lead" placeholder="Nombre del líder"/></div>
+    <div class="field">
+      <label>Líder / Jefe de equipo</label>
+      <select id="team-lead"><option value="">— Sin líder —</option></select>
+      <div id="team-lead-hint" style="font-size:.75rem;color:var(--text-muted);margin-top:5px;display:none">Agrega miembros al equipo primero para asignar un líder.</div>
+    </div>
     <div class="field"><label>Descripción (opcional)</label><textarea id="team-desc" rows="2" placeholder="Funciones principales del equipo…"></textarea></div>
     <div style="display:flex;gap:8px;margin-top:16px;">
       <button class="btn btn-primary btn-full" onclick="saveTeam()">Guardar</button>
@@ -441,11 +448,11 @@ function save(db) { localStorage.setItem(STORE_KEY, JSON.stringify(db)); }
 function defaultData() {
   return {
     teams: [
-      { id: 't1', name: 'Infraestructura', color: '#3b9eff', lead: '', desc: '' },
-      { id: 't2', name: 'Desarrollo', color: '#22c55e', lead: '', desc: '' },
-      { id: 't3', name: 'Datos & Analytics', color: '#a855f7', lead: '', desc: '' },
-      { id: 't4', name: 'Seguridad', color: '#ef4444', lead: '', desc: '' },
-      { id: 't5', name: 'Soporte', color: '#f59e0b', lead: '', desc: '' }
+      { id: 't1', name: 'Infraestructura', color: '#3b9eff', leadId: '', desc: '' },
+      { id: 't2', name: 'Desarrollo', color: '#22c55e', leadId: '', desc: '' },
+      { id: 't3', name: 'Datos & Analytics', color: '#a855f7', leadId: '', desc: '' },
+      { id: 't4', name: 'Seguridad', color: '#ef4444', leadId: '', desc: '' },
+      { id: 't5', name: 'Soporte', color: '#f59e0b', leadId: '', desc: '' }
     ],
     employees: []
   };
@@ -501,7 +508,7 @@ function renderHome() {
     const pendObj = members.reduce((a,e)=> a+(e.objetivos||[]).filter(o=>o.estado==='Pendiente').length,0);
     return `<div class="team-tile" style="--team-color:${t.color}" onclick="openTeam('${t.id}')">
       <div class="team-name">${t.name}</div>
-      ${t.lead ? `<div style="font-size:.8rem;color:var(--text-muted)">Líder: ${t.lead}</div>` : ''}
+      ${(()=>{ const l=t.leadId?db.employees.find(e=>e.id===t.leadId):null; return l?`<div style="font-size:.8rem;color:var(--text-muted)">👑 Líder: ${l.nombre} ${l.apellido}</div>`:''; })()}
       <div class="team-stats">
         <div class="team-stat"><div class="team-stat-val">${members.length}</div><div class="team-stat-lbl">Personas</div></div>
         <div class="team-stat"><div class="team-stat-val">${members.reduce((a,e)=>(a+(e.objetivos||[]).length),0)}</div><div class="team-stat-lbl">Objetivos</div></div>
@@ -536,16 +543,19 @@ function filterMembers() {
     grid.innerHTML = '<div class="empty" style="grid-column:1/-1"><div class="empty-icon">👤</div><p>No hay personas en este equipo</p></div>';
     return;
   }
+  const team = db.teams.find(t => t.id === currentTeamId);
   grid.innerHTML = members.map(e => {
     const initials = ((e.nombre||'?')[0]+(e.apellido||'')[0]).toUpperCase();
     const pendObj = (e.objetivos||[]).filter(o=>o.estado==='Pendiente').length;
     const pendCap = (e.capacitaciones||[]).filter(c=>c.estado==='Pendiente').length;
-    return `<div class="member-card" onclick="openEmployee('${e.id}')">
-      <div class="avatar">${initials}</div>
+    const isLeader = team && team.leadId === e.id;
+    return `<div class="member-card${isLeader?' member-leader':''}" onclick="openEmployee('${e.id}')">
+      <div class="avatar">${isLeader?'👑':initials}</div>
       <div class="member-info">
         <div class="member-name">${e.nombre} ${e.apellido}</div>
         <div class="member-role">${e.cargo||'Sin cargo'}</div>
         <div class="member-badges">
+          ${isLeader ? `<span class="badge badge-leader">Líder</span>` : ''}
           ${pendObj ? `<span class="badge badge-pending">${pendObj} obj.</span>` : ''}
           ${pendCap ? `<span class="badge badge-pending">${pendCap} cap.</span>` : ''}
           ${(e.conversaciones||[]).length ? `<span class="badge badge-info">${(e.conversaciones||[]).length} 1:1</span>` : ''}
@@ -715,8 +725,26 @@ function openTeamForm(edit) {
   document.getElementById('team-id').value = t ? t.id : '';
   document.getElementById('team-name').value = t ? t.name : '';
   document.getElementById('team-color').value = t ? t.color : '#3b9eff';
-  document.getElementById('team-lead').value = t ? t.lead : '';
   document.getElementById('team-desc').value = t ? t.desc : '';
+
+  const leadSel = document.getElementById('team-lead');
+  const leadHint = document.getElementById('team-lead-hint');
+  const members = t ? db.employees.filter(e => e.teamId === t.id) : [];
+  leadSel.innerHTML = '<option value="">— Sin líder —</option>';
+  if (!t || members.length === 0) {
+    leadSel.disabled = true;
+    leadHint.style.display = 'block';
+  } else {
+    leadSel.disabled = false;
+    leadHint.style.display = 'none';
+    members.forEach(m => {
+      const opt = document.createElement('option');
+      opt.value = m.id;
+      opt.textContent = `${m.nombre} ${m.apellido}${m.cargo?' · '+m.cargo:''}`;
+      if (t.leadId === m.id) opt.selected = true;
+      leadSel.appendChild(opt);
+    });
+  }
   openModal('modal-team');
 }
 
@@ -728,7 +756,7 @@ function saveTeam() {
   if (!name) { toast('El nombre es obligatorio'); return; }
   const data = {
     name, color: document.getElementById('team-color').value,
-    lead: document.getElementById('team-lead').value.trim(),
+    leadId: document.getElementById('team-lead').value,
     desc: document.getElementById('team-desc').value.trim()
   };
   if (id) { Object.assign(db.teams.find(t => t.id === id), data); }
@@ -795,6 +823,7 @@ function saveEmployee() {
 function deleteEmployee(eid) {
   if (!confirm('¿Eliminar esta persona y todos sus registros?')) return;
   db.employees = db.employees.filter(e => e.id !== eid);
+  db.teams.forEach(t => { if (t.leadId === eid) t.leadId = ''; });
   save(db); backToTeam(); toast('Persona eliminada');
 }
 
