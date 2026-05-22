@@ -1,0 +1,959 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Gestión de Equipo · AquaChile</title>
+<style>
+:root {
+  --bg:#080f1a; --surface:#0f1e30; --surface2:#162840; --surface3:#1e3350;
+  --primary:#0d5fa5; --accent:#3b9eff; --accent2:#7ecbff;
+  --success:#22c55e; --warning:#f59e0b; --danger:#ef4444;
+  --text:#c8d8ec; --text-bright:#eef4fd; --text-muted:#6b8099;
+  --border:rgba(59,158,255,0.12); --border2:rgba(255,255,255,0.07);
+  --glow:rgba(59,158,255,0.25); --shadow:0 4px 24px rgba(0,0,0,0.5);
+  --r:14px; --r-sm:8px;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6;}
+
+/* SCREENS */
+.screen{display:none;min-height:100vh;padding:16px 16px 80px;}
+.screen.active{display:block;}
+.container{max-width:900px;margin:0 auto;}
+
+/* APP HEADER */
+.app-header{text-align:center;padding:36px 0 28px;}
+.app-logo{font-size:clamp(1.4rem,4vw,2.2rem);font-weight:900;letter-spacing:-0.5px;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:6px;}
+.app-tagline{color:var(--text-muted);font-size:0.88rem;}
+
+/* NAV */
+.nav-bar{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);display:flex;z-index:100;}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 4px;border:none;background:none;color:var(--text-muted);font-size:0.68rem;cursor:pointer;transition:color .18s;}
+.nav-btn.active,.nav-btn:hover{color:var(--accent);}
+.nav-icon{font-size:1.3rem;}
+
+/* CARDS */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px;box-shadow:var(--shadow);}
+.card+.card{margin-top:14px;}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 20px;border:none;border-radius:var(--r-sm);font-size:0.9rem;font-weight:600;cursor:pointer;transition:all .18s;text-decoration:none;white-space:nowrap;}
+.btn:disabled{opacity:.4;pointer-events:none;}
+.btn-primary{background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff;}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 20px var(--glow);}
+.btn-success{background:linear-gradient(135deg,#15803d,var(--success));color:#fff;}
+.btn-danger{background:linear-gradient(135deg,#b91c1c,var(--danger));color:#fff;}
+.btn-ghost{background:var(--surface2);color:var(--text);border:1px solid var(--border2);}
+.btn-ghost:hover{border-color:var(--accent);color:var(--accent);}
+.btn-sm{padding:6px 12px;font-size:0.8rem;}
+.btn-full{width:100%;}
+
+/* BACK BUTTON */
+.back-btn{display:flex;align-items:center;gap:8px;background:none;border:none;color:var(--text-muted);font-size:0.9rem;cursor:pointer;padding:8px 0;margin-bottom:16px;}
+.back-btn:hover{color:var(--accent);}
+
+/* PAGE HEADER */
+.page-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;}
+.page-hdr h2{font-size:1.2rem;color:var(--text-bright);font-weight:700;}
+
+/* TEAMS GRID */
+.teams-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;margin-top:8px;}
+.team-tile{background:var(--surface);border:1.5px solid var(--border2);border-radius:var(--r);padding:24px 20px;cursor:pointer;transition:all .22s;position:relative;overflow:hidden;}
+.team-tile::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--team-color,var(--accent));}
+.team-tile:hover{border-color:var(--team-color,var(--accent));transform:translateY(-3px);box-shadow:0 10px 32px rgba(0,0,0,0.4);}
+.team-name{font-size:1.05rem;font-weight:700;color:var(--text-bright);margin-bottom:6px;}
+.team-stats{display:flex;gap:16px;margin-top:14px;}
+.team-stat{text-align:center;}
+.team-stat-val{font-size:1.4rem;font-weight:800;color:var(--team-color,var(--accent));}
+.team-stat-lbl{font-size:0.72rem;color:var(--text-muted);}
+
+/* MEMBERS LIST */
+.members-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;}
+.member-card{background:var(--surface);border:1px solid var(--border2);border-radius:var(--r);padding:18px 16px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:14px;}
+.member-card:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:0 6px 20px var(--glow);}
+.avatar{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff;font-size:1.1rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.member-info{min-width:0;}
+.member-name{font-weight:700;color:var(--text-bright);font-size:0.95rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.member-role{font-size:0.78rem;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.member-badges{display:flex;gap:4px;margin-top:6px;flex-wrap:wrap;}
+.badge{font-size:0.68rem;padding:2px 7px;border-radius:20px;font-weight:600;}
+.badge-pending{background:rgba(245,158,11,0.15);color:var(--warning);}
+.badge-ok{background:rgba(34,197,94,0.12);color:var(--success);}
+.badge-info{background:rgba(59,158,255,0.12);color:var(--accent);}
+
+/* EMPLOYEE PROFILE TABS */
+.profile-hero{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:24px;display:flex;align-items:center;gap:20px;margin-bottom:20px;}
+.profile-avatar{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff;font-size:1.8rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.profile-name{font-size:1.3rem;font-weight:800;color:var(--text-bright);}
+.profile-role{color:var(--text-muted);font-size:0.88rem;}
+.profile-team{display:inline-block;margin-top:6px;font-size:0.75rem;font-weight:600;padding:3px 10px;border-radius:20px;background:rgba(59,158,255,0.12);color:var(--accent);}
+
+.tabs{display:flex;gap:4px;margin-bottom:20px;overflow-x:auto;padding-bottom:2px;}
+.tab{padding:8px 16px;border:none;border-radius:var(--r-sm);background:var(--surface2);color:var(--text-muted);font-size:0.85rem;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .18s;}
+.tab.active{background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff;}
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+
+/* INFO GRID */
+.info-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;}
+.info-item label{font-size:0.72rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.6px;}
+.info-item p{font-size:0.92rem;color:var(--text-bright);margin-top:2px;}
+
+/* SECTION LABEL */
+.section-lbl{font-size:0.78rem;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.7px;margin:20px 0 12px;display:flex;align-items:center;gap:8px;}
+.section-lbl::after{content:'';flex:1;height:1px;background:var(--border);}
+
+/* COMMITMENT ITEMS */
+.commit-list{display:flex;flex-direction:column;gap:10px;}
+.commit-item{background:var(--surface2);border:1px solid var(--border2);border-radius:var(--r-sm);padding:14px 16px;}
+.commit-header{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;}
+.commit-title{font-weight:600;color:var(--text-bright);font-size:0.92rem;}
+.commit-meta{font-size:0.78rem;color:var(--text-muted);margin-top:4px;}
+.commit-body{font-size:0.85rem;color:var(--text);margin-top:8px;line-height:1.5;}
+.status-chip{font-size:0.72rem;font-weight:700;padding:3px 9px;border-radius:20px;white-space:nowrap;flex-shrink:0;}
+.status-pendiente{background:rgba(245,158,11,0.15);color:var(--warning);}
+.status-en-curso{background:rgba(59,158,255,0.15);color:var(--accent);}
+.status-completado{background:rgba(34,197,94,0.12);color:var(--success);}
+.status-cancelado{background:rgba(239,68,68,0.12);color:var(--danger);}
+
+/* PROGRESS BAR */
+.progress-wrap{margin-top:10px;}
+.progress-lbl{display:flex;justify-content:space-between;font-size:0.75rem;color:var(--text-muted);margin-bottom:4px;}
+.progress-bar{height:6px;background:var(--surface3);border-radius:3px;overflow:hidden;}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--primary),var(--accent));border-radius:3px;transition:width .3s;}
+
+/* FORMS */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:200;align-items:center;justify-content:center;padding:16px;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);width:100%;max-width:560px;max-height:90vh;overflow-y:auto;}
+.modal-hdr{padding:20px 20px 0;display:flex;align-items:center;justify-content:space-between;}
+.modal-hdr h3{font-size:1.05rem;font-weight:700;color:var(--text-bright);}
+.modal-close{background:none;border:none;color:var(--text-muted);font-size:1.4rem;cursor:pointer;line-height:1;}
+.modal-close:hover{color:var(--danger);}
+.modal-body{padding:20px;}
+
+.field{margin-bottom:12px;}
+.field label{display:block;font-size:0.75rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px;}
+.field input,.field select,.field textarea{width:100%;padding:10px 12px;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--r-sm);color:var(--text-bright);font-size:0.9rem;transition:border-color .18s;}
+.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--accent);}
+.field textarea{resize:vertical;min-height:80px;font-family:inherit;}
+.field select option{background:var(--surface2);}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+
+/* EMPTY STATE */
+.empty{text-align:center;padding:40px 20px;color:var(--text-muted);}
+.empty-icon{font-size:2.4rem;margin-bottom:12px;}
+.empty p{font-size:0.88rem;}
+
+/* STATS ROW */
+.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px;}
+.stat-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);padding:16px;text-align:center;}
+.stat-val{font-size:1.6rem;font-weight:800;color:var(--accent);}
+.stat-lbl{font-size:0.72rem;color:var(--text-muted);}
+
+/* SEARCH */
+.search-bar{display:flex;gap:8px;margin-bottom:16px;}
+.search-bar input{flex:1;padding:10px 14px;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--r-sm);color:var(--text-bright);font-size:0.9rem;}
+.search-bar input:focus{outline:none;border-color:var(--accent);}
+
+/* TOAST */
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--surface3);border:1px solid var(--border);border-radius:var(--r-sm);padding:10px 20px;font-size:0.88rem;color:var(--text-bright);opacity:0;transition:all .3s;z-index:300;pointer-events:none;white-space:nowrap;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+@media(max-width:600px){
+  .stats-row{grid-template-columns:repeat(2,1fr);}
+  .grid-2{grid-template-columns:1fr;}
+  .profile-hero{flex-direction:column;text-align:center;}
+}
+</style>
+</head>
+<body>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- HOME SCREEN -->
+<div class="screen active" id="screen-home">
+<div class="container">
+  <div class="app-header">
+    <div class="app-logo">👥 Mi Equipo</div>
+    <div class="app-tagline">Gestión del ciclo de vida laboral · AquaChile</div>
+  </div>
+
+  <div class="stats-row" id="home-stats"></div>
+
+  <div class="page-hdr">
+    <h2>Equipos</h2>
+    <button class="btn btn-sm btn-ghost" onclick="openTeamForm()">+ Equipo</button>
+  </div>
+  <div class="teams-grid" id="teams-grid"></div>
+</div>
+</div>
+
+<!-- TEAM SCREEN -->
+<div class="screen" id="screen-team">
+<div class="container">
+  <button class="back-btn" onclick="showScreen('home')">← Volver</button>
+  <div class="page-hdr">
+    <h2 id="team-screen-name">Equipo</h2>
+    <div style="display:flex;gap:8px;">
+      <button class="btn btn-sm btn-ghost" onclick="editCurrentTeam()">Editar</button>
+      <button class="btn btn-sm btn-primary" onclick="openEmployeeForm()">+ Persona</button>
+    </div>
+  </div>
+  <div class="search-bar">
+    <input type="text" id="member-search" placeholder="Buscar por nombre o cargo…" oninput="filterMembers()"/>
+  </div>
+  <div class="members-grid" id="members-grid"></div>
+</div>
+</div>
+
+<!-- EMPLOYEE SCREEN -->
+<div class="screen" id="screen-employee">
+<div class="container">
+  <button class="back-btn" id="emp-back-btn" onclick="backToTeam()">← Volver al equipo</button>
+  <div class="profile-hero" id="profile-hero"></div>
+
+  <div class="tabs" id="profile-tabs">
+    <button class="tab active" onclick="showTab('personal',this)">Personal</button>
+    <button class="tab" onclick="showTab('laboral',this)">Laboral</button>
+    <button class="tab" onclick="showTab('objetivos',this)">Objetivos</button>
+    <button class="tab" onclick="showTab('conversaciones',this)">Conversaciones</button>
+    <button class="tab" onclick="showTab('capacitaciones',this)">Capacitaciones</button>
+    <button class="tab" onclick="showTab('reconocimientos',this)">Reconoc.</button>
+  </div>
+
+  <!-- Personal -->
+  <div class="tab-panel active" id="tab-personal">
+    <div class="card">
+      <div class="page-hdr" style="margin-bottom:12px;">
+        <span class="section-lbl" style="margin:0">Datos Personales</span>
+        <button class="btn btn-sm btn-ghost" onclick="openEmployeeForm(true)">Editar</button>
+      </div>
+      <div class="info-grid" id="info-personal"></div>
+
+      <div class="section-lbl">Familia</div>
+      <div class="info-grid" id="info-familia"></div>
+
+      <div class="section-lbl">Formación</div>
+      <div class="info-grid" id="info-formacion"></div>
+    </div>
+  </div>
+
+  <!-- Laboral -->
+  <div class="tab-panel" id="tab-laboral">
+    <div class="card">
+      <div class="page-hdr" style="margin-bottom:12px;">
+        <span class="section-lbl" style="margin:0">Datos Laborales</span>
+        <button class="btn btn-sm btn-ghost" onclick="openEmployeeForm(true)">Editar</button>
+      </div>
+      <div class="info-grid" id="info-laboral"></div>
+    </div>
+  </div>
+
+  <!-- Objetivos -->
+  <div class="tab-panel" id="tab-objetivos">
+    <div class="page-hdr">
+      <h2>Objetivos y Metas</h2>
+      <button class="btn btn-sm btn-primary" onclick="openCommitForm('objetivo')">+ Objetivo</button>
+    </div>
+    <div class="commit-list" id="list-objetivos"></div>
+  </div>
+
+  <!-- Conversaciones -->
+  <div class="tab-panel" id="tab-conversaciones">
+    <div class="page-hdr">
+      <h2>Conversaciones 1:1</h2>
+      <button class="btn btn-sm btn-primary" onclick="openCommitForm('conversacion')">+ Conversación</button>
+    </div>
+    <div class="commit-list" id="list-conversaciones"></div>
+  </div>
+
+  <!-- Capacitaciones -->
+  <div class="tab-panel" id="tab-capacitaciones">
+    <div class="page-hdr">
+      <h2>Capacitaciones</h2>
+      <button class="btn btn-sm btn-primary" onclick="openCommitForm('capacitacion')">+ Capacitación</button>
+    </div>
+    <div class="commit-list" id="list-capacitaciones"></div>
+  </div>
+
+  <!-- Reconocimientos -->
+  <div class="tab-panel" id="tab-reconocimientos">
+    <div class="page-hdr">
+      <h2>Reconocimientos</h2>
+      <button class="btn btn-sm btn-primary" onclick="openCommitForm('reconocimiento')">+ Registro</button>
+    </div>
+    <div class="commit-list" id="list-reconocimientos"></div>
+  </div>
+</div>
+</div>
+
+<!-- MODALS -->
+
+<!-- TEAM FORM -->
+<div class="modal-overlay" id="modal-team">
+<div class="modal">
+  <div class="modal-hdr">
+    <h3 id="team-form-title">Nuevo Equipo</h3>
+    <button class="modal-close" onclick="closeModal('modal-team')">×</button>
+  </div>
+  <div class="modal-body">
+    <input type="hidden" id="team-id"/>
+    <div class="field"><label>Nombre del Equipo</label><input type="text" id="team-name" placeholder="Ej: Infraestructura, Desarrollo…"/></div>
+    <div class="field"><label>Color</label>
+      <select id="team-color">
+        <option value="#3b9eff">Azul</option>
+        <option value="#22c55e">Verde</option>
+        <option value="#f59e0b">Naranja</option>
+        <option value="#a855f7">Morado</option>
+        <option value="#ef4444">Rojo</option>
+      </select>
+    </div>
+    <div class="field"><label>Líder / Jefe de equipo</label><input type="text" id="team-lead" placeholder="Nombre del líder"/></div>
+    <div class="field"><label>Descripción (opcional)</label><textarea id="team-desc" rows="2" placeholder="Funciones principales del equipo…"></textarea></div>
+    <div style="display:flex;gap:8px;margin-top:16px;">
+      <button class="btn btn-primary btn-full" onclick="saveTeam()">Guardar</button>
+      <button class="btn btn-ghost" onclick="closeModal('modal-team')">Cancelar</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- EMPLOYEE FORM -->
+<div class="modal-overlay" id="modal-employee">
+<div class="modal">
+  <div class="modal-hdr">
+    <h3 id="emp-form-title">Nueva Persona</h3>
+    <button class="modal-close" onclick="closeModal('modal-employee')">×</button>
+  </div>
+  <div class="modal-body">
+    <input type="hidden" id="emp-id"/>
+    <div class="section-lbl" style="margin-top:0">Datos Personales</div>
+    <div class="grid-2">
+      <div class="field"><label>Nombre</label><input type="text" id="emp-nombre" placeholder="Nombre"/></div>
+      <div class="field"><label>Apellido</label><input type="text" id="emp-apellido" placeholder="Apellido"/></div>
+    </div>
+    <div class="grid-2">
+      <div class="field"><label>RUT</label><input type="text" id="emp-rut" placeholder="12.345.678-9"/></div>
+      <div class="field"><label>Fecha de nacimiento</label><input type="date" id="emp-nacimiento"/></div>
+    </div>
+    <div class="grid-2">
+      <div class="field"><label>Email</label><input type="email" id="emp-email" placeholder="correo@aquachile.com"/></div>
+      <div class="field"><label>Teléfono</label><input type="tel" id="emp-tel" placeholder="+56 9 1234 5678"/></div>
+    </div>
+
+    <div class="section-lbl">Familia</div>
+    <div class="grid-2">
+      <div class="field"><label>Estado Civil</label>
+        <select id="emp-estadocivil">
+          <option value="">— Seleccionar —</option>
+          <option>Soltero/a</option><option>Casado/a</option>
+          <option>Conviviente</option><option>Divorciado/a</option><option>Viudo/a</option>
+        </select>
+      </div>
+      <div class="field"><label>N° de hijos</label><input type="number" id="emp-hijos" min="0" placeholder="0"/></div>
+    </div>
+    <div class="grid-2">
+      <div class="field"><label>Contacto emergencia</label><input type="text" id="emp-emerg-nombre" placeholder="Nombre"/></div>
+      <div class="field"><label>Tel. emergencia</label><input type="tel" id="emp-emerg-tel" placeholder="+56 9…"/></div>
+    </div>
+
+    <div class="section-lbl">Formación</div>
+    <div class="field"><label>Nivel educacional</label>
+      <select id="emp-educacion">
+        <option value="">— Seleccionar —</option>
+        <option>Básica</option><option>Media</option><option>Técnico Superior</option>
+        <option>Universitaria</option><option>Postgrado / Magíster</option><option>Doctorado</option>
+      </select>
+    </div>
+    <div class="field"><label>Título / Profesión</label><input type="text" id="emp-titulo" placeholder="Ej: Ingeniero Civil Informático"/></div>
+    <div class="field"><label>Certificaciones (separadas por coma)</label><input type="text" id="emp-cert" placeholder="AWS, PMP, Scrum Master…"/></div>
+    <div class="field"><label>Idiomas</label><input type="text" id="emp-idiomas" placeholder="Español, Inglés B2…"/></div>
+
+    <div class="section-lbl">Datos Laborales</div>
+    <div class="field"><label>Cargo</label><input type="text" id="emp-cargo" placeholder="Ej: Analista de Sistemas"/></div>
+    <div class="grid-2">
+      <div class="field"><label>Fecha de ingreso</label><input type="date" id="emp-ingreso"/></div>
+      <div class="field"><label>Tipo de contrato</label>
+        <select id="emp-contrato">
+          <option value="">— Seleccionar —</option>
+          <option>Indefinido</option><option>Plazo Fijo</option>
+          <option>Por Obra</option><option>Honorarios</option><option>Práctica</option>
+        </select>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="field"><label>Centro de costo</label><input type="text" id="emp-ceco" placeholder="Ej: TI-001"/></div>
+      <div class="field"><label>Jornada</label>
+        <select id="emp-jornada">
+          <option value="">— Seleccionar —</option>
+          <option>Completa</option><option>Parcial</option><option>Turno</option>
+        </select>
+      </div>
+    </div>
+
+    <div style="display:flex;gap:8px;margin-top:16px;">
+      <button class="btn btn-primary btn-full" onclick="saveEmployee()">Guardar</button>
+      <button class="btn btn-ghost" onclick="closeModal('modal-employee')">Cancelar</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- COMMITMENT FORM -->
+<div class="modal-overlay" id="modal-commit">
+<div class="modal">
+  <div class="modal-hdr">
+    <h3 id="commit-form-title">Nuevo Compromiso</h3>
+    <button class="modal-close" onclick="closeModal('modal-commit')">×</button>
+  </div>
+  <div class="modal-body" id="commit-form-body"></div>
+</div>
+</div>
+
+<!-- NAV BAR -->
+<nav class="nav-bar">
+  <button class="nav-btn active" id="nav-home" onclick="showScreen('home');setNav('nav-home')">
+    <span class="nav-icon">🏠</span><span>Inicio</span>
+  </button>
+  <button class="nav-btn" id="nav-team" onclick="showScreen('team');setNav('nav-team')" style="display:none">
+    <span class="nav-icon">👥</span><span>Equipo</span>
+  </button>
+  <button class="nav-btn" id="nav-emp" onclick="showScreen('employee');setNav('nav-emp')" style="display:none">
+    <span class="nav-icon">👤</span><span>Persona</span>
+  </button>
+</nav>
+
+<script>
+// ── DATA ──────────────────────────────────────────────────────────────────────
+const STORE_KEY = 'eq_mgr_v1';
+
+function load() {
+  try { return JSON.parse(localStorage.getItem(STORE_KEY)) || defaultData(); }
+  catch(e) { return defaultData(); }
+}
+
+function save(db) { localStorage.setItem(STORE_KEY, JSON.stringify(db)); }
+
+function defaultData() {
+  return {
+    teams: [
+      { id: 't1', name: 'Infraestructura', color: '#3b9eff', lead: '', desc: '' },
+      { id: 't2', name: 'Desarrollo', color: '#22c55e', lead: '', desc: '' },
+      { id: 't3', name: 'Datos & Analytics', color: '#a855f7', lead: '', desc: '' },
+      { id: 't4', name: 'Seguridad', color: '#ef4444', lead: '', desc: '' },
+      { id: 't5', name: 'Soporte', color: '#f59e0b', lead: '', desc: '' }
+    ],
+    employees: []
+  };
+}
+
+let db = load();
+let currentTeamId = null;
+let currentEmpId = null;
+let currentCommitType = null;
+let editingCommitId = null;
+
+// ── NAVIGATION ────────────────────────────────────────────────────────────────
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+  if (name === 'home') renderHome();
+  if (name === 'team') renderTeam();
+  if (name === 'employee') renderEmployee();
+}
+
+function setNav(id) {
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function backToTeam() {
+  document.getElementById('nav-emp').style.display = 'none';
+  showScreen('team');
+  setNav('nav-team');
+}
+
+// ── HOME ──────────────────────────────────────────────────────────────────────
+function renderHome() {
+  const totalEmp = db.employees.length;
+  const totalObj = db.employees.reduce((a,e) => a + (e.objetivos||[]).length, 0);
+  const totalCap = db.employees.reduce((a,e) => a + (e.capacitaciones||[]).length, 0);
+  const pending = db.employees.reduce((a,e) =>
+    a + (e.objetivos||[]).filter(o=>o.estado==='Pendiente').length +
+        (e.capacitaciones||[]).filter(c=>c.estado==='Pendiente').length, 0);
+
+  document.getElementById('home-stats').innerHTML = `
+    <div class="stat-box"><div class="stat-val">${db.teams.length}</div><div class="stat-lbl">Equipos</div></div>
+    <div class="stat-box"><div class="stat-val">${totalEmp}</div><div class="stat-lbl">Personas</div></div>
+    <div class="stat-box"><div class="stat-val">${totalObj}</div><div class="stat-lbl">Objetivos</div></div>
+    <div class="stat-box"><div class="stat-val">${pending}</div><div class="stat-lbl">Pendientes</div></div>
+  `;
+
+  const grid = document.getElementById('teams-grid');
+  if (!db.teams.length) { grid.innerHTML = '<div class="empty"><div class="empty-icon">👥</div><p>Agrega tu primer equipo</p></div>'; return; }
+
+  grid.innerHTML = db.teams.map(t => {
+    const members = db.employees.filter(e => e.teamId === t.id);
+    const pendObj = members.reduce((a,e)=> a+(e.objetivos||[]).filter(o=>o.estado==='Pendiente').length,0);
+    return `<div class="team-tile" style="--team-color:${t.color}" onclick="openTeam('${t.id}')">
+      <div class="team-name">${t.name}</div>
+      ${t.lead ? `<div style="font-size:.8rem;color:var(--text-muted)">Líder: ${t.lead}</div>` : ''}
+      <div class="team-stats">
+        <div class="team-stat"><div class="team-stat-val">${members.length}</div><div class="team-stat-lbl">Personas</div></div>
+        <div class="team-stat"><div class="team-stat-val">${members.reduce((a,e)=>(a+(e.objetivos||[]).length),0)}</div><div class="team-stat-lbl">Objetivos</div></div>
+        <div class="team-stat"><div class="team-stat-val">${pendObj}</div><div class="team-stat-lbl">Pendientes</div></div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── TEAM ──────────────────────────────────────────────────────────────────────
+function openTeam(tid) {
+  currentTeamId = tid;
+  document.getElementById('nav-team').style.display = 'flex';
+  showScreen('team');
+  setNav('nav-team');
+}
+
+function renderTeam() {
+  const t = db.teams.find(t => t.id === currentTeamId);
+  if (!t) return;
+  document.getElementById('team-screen-name').textContent = t.name;
+  filterMembers();
+}
+
+function filterMembers() {
+  const q = (document.getElementById('member-search').value || '').toLowerCase();
+  const members = db.employees.filter(e => e.teamId === currentTeamId &&
+    (!q || (e.nombre+' '+e.apellido+' '+e.cargo).toLowerCase().includes(q)));
+
+  const grid = document.getElementById('members-grid');
+  if (!members.length) {
+    grid.innerHTML = '<div class="empty" style="grid-column:1/-1"><div class="empty-icon">👤</div><p>No hay personas en este equipo</p></div>';
+    return;
+  }
+  grid.innerHTML = members.map(e => {
+    const initials = ((e.nombre||'?')[0]+(e.apellido||'')[0]).toUpperCase();
+    const pendObj = (e.objetivos||[]).filter(o=>o.estado==='Pendiente').length;
+    const pendCap = (e.capacitaciones||[]).filter(c=>c.estado==='Pendiente').length;
+    return `<div class="member-card" onclick="openEmployee('${e.id}')">
+      <div class="avatar">${initials}</div>
+      <div class="member-info">
+        <div class="member-name">${e.nombre} ${e.apellido}</div>
+        <div class="member-role">${e.cargo||'Sin cargo'}</div>
+        <div class="member-badges">
+          ${pendObj ? `<span class="badge badge-pending">${pendObj} obj.</span>` : ''}
+          ${pendCap ? `<span class="badge badge-pending">${pendCap} cap.</span>` : ''}
+          ${(e.conversaciones||[]).length ? `<span class="badge badge-info">${(e.conversaciones||[]).length} 1:1</span>` : ''}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ── EMPLOYEE ──────────────────────────────────────────────────────────────────
+function openEmployee(eid) {
+  currentEmpId = eid;
+  document.getElementById('nav-emp').style.display = 'flex';
+  showScreen('employee');
+  setNav('nav-emp');
+  // reset tabs
+  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', i===0));
+  document.querySelectorAll('.tab-panel').forEach((p,i) => p.classList.toggle('active', i===0));
+}
+
+function renderEmployee() {
+  const e = db.employees.find(e => e.id === currentEmpId);
+  if (!e) return;
+  const t = db.teams.find(t => t.id === e.teamId);
+  const initials = ((e.nombre||'?')[0]+(e.apellido||'')[0]).toUpperCase();
+
+  document.getElementById('profile-hero').innerHTML = `
+    <div class="profile-avatar">${initials}</div>
+    <div>
+      <div class="profile-name">${e.nombre} ${e.apellido}</div>
+      <div class="profile-role">${e.cargo||'Sin cargo definido'}</div>
+      ${t ? `<span class="profile-team" style="background:${t.color}22;color:${t.color}">${t.name}</span>` : ''}
+    </div>
+    <div style="margin-left:auto;display:flex;gap:6px;">
+      <button class="btn btn-sm btn-ghost" onclick="deleteEmployee('${e.id}')">Eliminar</button>
+    </div>
+  `;
+
+  // Personal
+  document.getElementById('info-personal').innerHTML = infoItems([
+    ['Nombre completo', `${e.nombre} ${e.apellido}`],
+    ['RUT', e.rut], ['Email', e.email], ['Teléfono', e.tel],
+    ['Fecha de nacimiento', e.nacimiento ? fmtDate(e.nacimiento) : '—'],
+    ['Edad', e.nacimiento ? calcAge(e.nacimiento)+' años' : '—'],
+  ]);
+
+  document.getElementById('info-familia').innerHTML = infoItems([
+    ['Estado civil', e.estadoCivil], ['N° de hijos', e.hijos ?? '—'],
+    ['Contacto emergencia', e.emergNombre], ['Tel. emergencia', e.emergTel],
+  ]);
+
+  document.getElementById('info-formacion').innerHTML = infoItems([
+    ['Nivel educacional', e.educacion], ['Título / Profesión', e.titulo],
+    ['Certificaciones', e.cert], ['Idiomas', e.idiomas],
+  ]);
+
+  // Laboral
+  document.getElementById('info-laboral').innerHTML = infoItems([
+    ['Cargo', e.cargo], ['Tipo de contrato', e.contrato],
+    ['Fecha de ingreso', e.ingreso ? fmtDate(e.ingreso) : '—'],
+    ['Antigüedad', e.ingreso ? calcAge(e.ingreso)+' años' : '—'],
+    ['Centro de costo', e.ceco], ['Jornada', e.jornada],
+    ['Equipo', t ? t.name : '—'],
+  ]);
+
+  renderCommitList('objetivos', e.objetivos||[], renderObjetivo);
+  renderCommitList('conversaciones', e.conversaciones||[], renderConversacion);
+  renderCommitList('capacitaciones', e.capacitaciones||[], renderCapacitacion);
+  renderCommitList('reconocimientos', e.reconocimientos||[], renderReconocimiento);
+}
+
+function infoItems(pairs) {
+  return pairs.map(([l,v]) => `<div class="info-item"><label>${l}</label><p>${v||'—'}</p></div>`).join('');
+}
+
+function renderCommitList(type, items, renderFn) {
+  const el = document.getElementById('list-'+type);
+  if (!items.length) { el.innerHTML = '<div class="empty"><div class="empty-icon">📋</div><p>Sin registros aún</p></div>'; return; }
+  el.innerHTML = items.map(item => renderFn(item)).join('');
+}
+
+function renderObjetivo(o) {
+  return `<div class="commit-item">
+    <div class="commit-header">
+      <div>
+        <div class="commit-title">${o.titulo}</div>
+        <div class="commit-meta">Vence: ${o.fechaLimite ? fmtDate(o.fechaLimite) : '—'}</div>
+      </div>
+      <div style="display:flex;gap:6px;align-items:center">
+        <span class="status-chip status-${slugify(o.estado)}">${o.estado}</span>
+        <button class="btn btn-sm btn-ghost" onclick="openCommitForm('objetivo','${o.id}')">✏</button>
+        <button class="btn btn-sm btn-danger" onclick="deleteCommit('objetivos','${o.id}')">✕</button>
+      </div>
+    </div>
+    ${o.descripcion ? `<div class="commit-body">${o.descripcion}</div>` : ''}
+    <div class="progress-wrap">
+      <div class="progress-lbl"><span>Avance</span><span>${o.progreso||0}%</span></div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${o.progreso||0}%"></div></div>
+    </div>
+  </div>`;
+}
+
+function renderConversacion(c) {
+  return `<div class="commit-item">
+    <div class="commit-header">
+      <div>
+        <div class="commit-title">${c.tipo||'1:1'} · ${c.fecha ? fmtDate(c.fecha) : '—'}</div>
+        <div class="commit-meta">${c.proximaFecha ? 'Próxima: '+fmtDate(c.proximaFecha) : ''}</div>
+      </div>
+      <div style="display:flex;gap:6px;">
+        <button class="btn btn-sm btn-ghost" onclick="openCommitForm('conversacion','${c.id}')">✏</button>
+        <button class="btn btn-sm btn-danger" onclick="deleteCommit('conversaciones','${c.id}')">✕</button>
+      </div>
+    </div>
+    ${c.resumen ? `<div class="commit-body"><b>Resumen:</b> ${c.resumen}</div>` : ''}
+    ${c.acuerdos ? `<div class="commit-body"><b>Acuerdos:</b> ${c.acuerdos}</div>` : ''}
+  </div>`;
+}
+
+function renderCapacitacion(c) {
+  return `<div class="commit-item">
+    <div class="commit-header">
+      <div>
+        <div class="commit-title">${c.nombre}</div>
+        <div class="commit-meta">${c.institucion||''} · ${c.horas ? c.horas+' hrs' : ''}</div>
+      </div>
+      <div style="display:flex;gap:6px;align-items:center">
+        <span class="status-chip status-${slugify(c.estado)}">${c.estado}</span>
+        <button class="btn btn-sm btn-ghost" onclick="openCommitForm('capacitacion','${c.id}')">✏</button>
+        <button class="btn btn-sm btn-danger" onclick="deleteCommit('capacitaciones','${c.id}')">✕</button>
+      </div>
+    </div>
+    ${c.fechaInicio ? `<div class="commit-meta" style="margin-top:6px">${fmtDate(c.fechaInicio)} → ${c.fechaFin ? fmtDate(c.fechaFin) : 'en curso'}</div>` : ''}
+  </div>`;
+}
+
+function renderReconocimiento(r) {
+  const colors = { 'Reconocimiento': 'success', 'Llamado de atención': 'pendiente', 'Sanción': 'cancelado', 'Hito': 'en-curso' };
+  const cls = colors[r.tipo] || 'info';
+  return `<div class="commit-item">
+    <div class="commit-header">
+      <div>
+        <div class="commit-title">${r.tipo} · ${r.fecha ? fmtDate(r.fecha) : '—'}</div>
+        <div class="commit-meta">${r.registradoPor ? 'Registrado por: '+r.registradoPor : ''}</div>
+      </div>
+      <div style="display:flex;gap:6px;">
+        <button class="btn btn-sm btn-ghost" onclick="openCommitForm('reconocimiento','${r.id}')">✏</button>
+        <button class="btn btn-sm btn-danger" onclick="deleteCommit('reconocimientos','${r.id}')">✕</button>
+      </div>
+    </div>
+    ${r.descripcion ? `<div class="commit-body">${r.descripcion}</div>` : ''}
+  </div>`;
+}
+
+// ── TABS ──────────────────────────────────────────────────────────────────────
+function showTab(name, btn) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tab-'+name).classList.add('active');
+}
+
+// ── TEAM FORM ─────────────────────────────────────────────────────────────────
+function openTeamForm(edit) {
+  const t = edit ? db.teams.find(t => t.id === currentTeamId) : null;
+  document.getElementById('team-form-title').textContent = t ? 'Editar Equipo' : 'Nuevo Equipo';
+  document.getElementById('team-id').value = t ? t.id : '';
+  document.getElementById('team-name').value = t ? t.name : '';
+  document.getElementById('team-color').value = t ? t.color : '#3b9eff';
+  document.getElementById('team-lead').value = t ? t.lead : '';
+  document.getElementById('team-desc').value = t ? t.desc : '';
+  openModal('modal-team');
+}
+
+function editCurrentTeam() { openTeamForm(true); }
+
+function saveTeam() {
+  const id = document.getElementById('team-id').value;
+  const name = document.getElementById('team-name').value.trim();
+  if (!name) { toast('El nombre es obligatorio'); return; }
+  const data = {
+    name, color: document.getElementById('team-color').value,
+    lead: document.getElementById('team-lead').value.trim(),
+    desc: document.getElementById('team-desc').value.trim()
+  };
+  if (id) { Object.assign(db.teams.find(t => t.id === id), data); }
+  else { db.teams.push({ id: uid(), ...data }); }
+  save(db); closeModal('modal-team'); renderHome(); toast('Equipo guardado');
+}
+
+// ── EMPLOYEE FORM ─────────────────────────────────────────────────────────────
+function openEmployeeForm(edit) {
+  const e = edit ? db.employees.find(e => e.id === currentEmpId) : null;
+  document.getElementById('emp-form-title').textContent = e ? 'Editar Persona' : 'Nueva Persona';
+  const fields = {
+    'emp-id': e?.id||'', 'emp-nombre': e?.nombre||'', 'emp-apellido': e?.apellido||'',
+    'emp-rut': e?.rut||'', 'emp-nacimiento': e?.nacimiento||'',
+    'emp-email': e?.email||'', 'emp-tel': e?.tel||'',
+    'emp-estadocivil': e?.estadoCivil||'', 'emp-hijos': e?.hijos??'',
+    'emp-emerg-nombre': e?.emergNombre||'', 'emp-emerg-tel': e?.emergTel||'',
+    'emp-educacion': e?.educacion||'', 'emp-titulo': e?.titulo||'',
+    'emp-cert': e?.cert||'', 'emp-idiomas': e?.idiomas||'',
+    'emp-cargo': e?.cargo||'', 'emp-ingreso': e?.ingreso||'',
+    'emp-contrato': e?.contrato||'', 'emp-ceco': e?.ceco||'', 'emp-jornada': e?.jornada||''
+  };
+  Object.entries(fields).forEach(([id,val]) => { const el=document.getElementById(id); if(el) el.value=val; });
+  openModal('modal-employee');
+}
+
+function saveEmployee() {
+  const id = document.getElementById('emp-id').value;
+  const nombre = document.getElementById('emp-nombre').value.trim();
+  const apellido = document.getElementById('emp-apellido').value.trim();
+  if (!nombre || !apellido) { toast('Nombre y apellido son obligatorios'); return; }
+  const data = {
+    nombre, apellido,
+    rut: document.getElementById('emp-rut').value.trim(),
+    nacimiento: document.getElementById('emp-nacimiento').value,
+    email: document.getElementById('emp-email').value.trim(),
+    tel: document.getElementById('emp-tel').value.trim(),
+    estadoCivil: document.getElementById('emp-estadocivil').value,
+    hijos: document.getElementById('emp-hijos').value,
+    emergNombre: document.getElementById('emp-emerg-nombre').value.trim(),
+    emergTel: document.getElementById('emp-emerg-tel').value.trim(),
+    educacion: document.getElementById('emp-educacion').value,
+    titulo: document.getElementById('emp-titulo').value.trim(),
+    cert: document.getElementById('emp-cert').value.trim(),
+    idiomas: document.getElementById('emp-idiomas').value.trim(),
+    cargo: document.getElementById('emp-cargo').value.trim(),
+    ingreso: document.getElementById('emp-ingreso').value,
+    contrato: document.getElementById('emp-contrato').value,
+    ceco: document.getElementById('emp-ceco').value.trim(),
+    jornada: document.getElementById('emp-jornada').value,
+  };
+  if (id) {
+    const emp = db.employees.find(e => e.id === id);
+    Object.assign(emp, data);
+  } else {
+    db.employees.push({ id: uid(), teamId: currentTeamId, objetivos:[], conversaciones:[], capacitaciones:[], reconocimientos:[], ...data });
+  }
+  save(db); closeModal('modal-employee');
+  renderTeam();
+  if (id) renderEmployee();
+  toast('Persona guardada');
+}
+
+function deleteEmployee(eid) {
+  if (!confirm('¿Eliminar esta persona y todos sus registros?')) return;
+  db.employees = db.employees.filter(e => e.id !== eid);
+  save(db); backToTeam(); toast('Persona eliminada');
+}
+
+// ── COMMITMENT FORMS ──────────────────────────────────────────────────────────
+function openCommitForm(type, editId) {
+  currentCommitType = type;
+  editingCommitId = editId || null;
+  const titles = { objetivo:'Objetivo', conversacion:'Conversación 1:1', capacitacion:'Capacitación', reconocimiento:'Reconocimiento / Sanción' };
+  document.getElementById('commit-form-title').textContent = (editId ? 'Editar ' : 'Nuevo ') + titles[type];
+  document.getElementById('commit-form-body').innerHTML = getCommitFormHTML(type, editId);
+  openModal('modal-commit');
+}
+
+function getCommitFormHTML(type, editId) {
+  const e = db.employees.find(e => e.id === currentEmpId);
+  let item = null;
+  const key = { objetivo:'objetivos', conversacion:'conversaciones', capacitacion:'capacitaciones', reconocimiento:'reconocimientos' }[type];
+  if (editId && e) item = (e[key]||[]).find(x => x.id === editId);
+
+  const v = (f, def='') => item ? (item[f]??def) : def;
+
+  if (type === 'objetivo') return `
+    <div class="field"><label>Título del objetivo</label><input type="text" id="cf-titulo" value="${v('titulo')}" placeholder="Ej: Certificar en AWS antes de junio"/></div>
+    <div class="field"><label>Descripción</label><textarea id="cf-desc">${v('descripcion')}</textarea></div>
+    <div class="grid-2">
+      <div class="field"><label>Fecha límite</label><input type="date" id="cf-fecha" value="${v('fechaLimite')}"/></div>
+      <div class="field"><label>Estado</label>
+        <select id="cf-estado">
+          ${['Pendiente','En curso','Completado','Cancelado'].map(s=>`<option ${v('estado')===s?'selected':''}>${s}</option>`).join('')}
+        </select>
+      </div>
+    </div>
+    <div class="field"><label>Avance (${v('progreso',0)}%)</label><input type="range" id="cf-prog" min="0" max="100" value="${v('progreso',0)}" oninput="this.previousElementSibling.textContent='Avance ('+this.value+'%)'"/></div>
+    <div style="display:flex;gap:8px;margin-top:16px;">
+      <button class="btn btn-primary btn-full" onclick="saveCommit()">Guardar</button>
+      <button class="btn btn-ghost" onclick="closeModal('modal-commit')">Cancelar</button>
+    </div>`;
+
+  if (type === 'conversacion') return `
+    <div class="grid-2">
+      <div class="field"><label>Fecha</label><input type="date" id="cf-fecha" value="${v('fecha')}"/></div>
+      <div class="field"><label>Tipo</label>
+        <select id="cf-tipo">
+          ${['Check-in','Feedback','Desarrollo','Seguimiento','Otro'].map(s=>`<option ${v('tipo')===s?'selected':''}>${s}</option>`).join('')}
+        </select>
+      </div>
+    </div>
+    <div class="field"><label>Resumen de la conversación</label><textarea id="cf-resumen">${v('resumen')}</textarea></div>
+    <div class="field"><label>Acuerdos / Compromisos</label><textarea id="cf-acuerdos">${v('acuerdos')}</textarea></div>
+    <div class="field"><label>Próxima reunión (opcional)</label><input type="date" id="cf-proxima" value="${v('proximaFecha')}"/></div>
+    <div style="display:flex;gap:8px;margin-top:16px;">
+      <button class="btn btn-primary btn-full" onclick="saveCommit()">Guardar</button>
+      <button class="btn btn-ghost" onclick="closeModal('modal-commit')">Cancelar</button>
+    </div>`;
+
+  if (type === 'capacitacion') return `
+    <div class="field"><label>Nombre de la capacitación</label><input type="text" id="cf-nombre" value="${v('nombre')}" placeholder="Ej: Excel Avanzado"/></div>
+    <div class="field"><label>Institución</label><input type="text" id="cf-inst" value="${v('institucion')}" placeholder="Ej: Udemy, Inacap…"/></div>
+    <div class="grid-2">
+      <div class="field"><label>Fecha inicio</label><input type="date" id="cf-inicio" value="${v('fechaInicio')}"/></div>
+      <div class="field"><label>Fecha término</label><input type="date" id="cf-fin" value="${v('fechaFin')}"/></div>
+    </div>
+    <div class="grid-2">
+      <div class="field"><label>Horas</label><input type="number" id="cf-horas" value="${v('horas')}" min="0" placeholder="40"/></div>
+      <div class="field"><label>Estado</label>
+        <select id="cf-estado">
+          ${['Pendiente','En curso','Completado','Cancelado'].map(s=>`<option ${v('estado')===s?'selected':''}>${s}</option>`).join('')}
+        </select>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:16px;">
+      <button class="btn btn-primary btn-full" onclick="saveCommit()">Guardar</button>
+      <button class="btn btn-ghost" onclick="closeModal('modal-commit')">Cancelar</button>
+    </div>`;
+
+  if (type === 'reconocimiento') return `
+    <div class="grid-2">
+      <div class="field"><label>Tipo</label>
+        <select id="cf-tipo">
+          ${['Reconocimiento','Hito','Llamado de atención','Sanción'].map(s=>`<option ${v('tipo')===s?'selected':''}>${s}</option>`).join('')}
+        </select>
+      </div>
+      <div class="field"><label>Fecha</label><input type="date" id="cf-fecha" value="${v('fecha')}"/></div>
+    </div>
+    <div class="field"><label>Descripción</label><textarea id="cf-desc">${v('descripcion')}</textarea></div>
+    <div class="field"><label>Registrado por</label><input type="text" id="cf-reg" value="${v('registradoPor')}" placeholder="Tu nombre o cargo"/></div>
+    <div style="display:flex;gap:8px;margin-top:16px;">
+      <button class="btn btn-primary btn-full" onclick="saveCommit()">Guardar</button>
+      <button class="btn btn-ghost" onclick="closeModal('modal-commit')">Cancelar</button>
+    </div>`;
+}
+
+function saveCommit() {
+  const e = db.employees.find(e => e.id === currentEmpId);
+  if (!e) return;
+  const type = currentCommitType;
+  const key = { objetivo:'objetivos', conversacion:'conversaciones', capacitacion:'capacitaciones', reconocimiento:'reconocimientos' }[type];
+
+  const g = id => { const el=document.getElementById(id); return el ? el.value : ''; };
+
+  let data;
+  if (type === 'objetivo') data = { titulo:g('cf-titulo').trim(), descripcion:g('cf-desc').trim(), fechaLimite:g('cf-fecha'), estado:g('cf-estado'), progreso:parseInt(g('cf-prog'))||0 };
+  else if (type === 'conversacion') data = { fecha:g('cf-fecha'), tipo:g('cf-tipo'), resumen:g('cf-resumen').trim(), acuerdos:g('cf-acuerdos').trim(), proximaFecha:g('cf-proxima') };
+  else if (type === 'capacitacion') data = { nombre:g('cf-nombre').trim(), institucion:g('cf-inst').trim(), fechaInicio:g('cf-inicio'), fechaFin:g('cf-fin'), horas:g('cf-horas'), estado:g('cf-estado') };
+  else if (type === 'reconocimiento') data = { tipo:g('cf-tipo'), fecha:g('cf-fecha'), descripcion:g('cf-desc').trim(), registradoPor:g('cf-reg').trim() };
+
+  if (!e[key]) e[key] = [];
+  if (editingCommitId) {
+    const idx = e[key].findIndex(x => x.id === editingCommitId);
+    if (idx >= 0) e[key][idx] = { id: editingCommitId, ...data };
+  } else {
+    e[key].push({ id: uid(), ...data });
+  }
+
+  save(db); closeModal('modal-commit'); renderEmployee(); toast('Guardado');
+}
+
+function deleteCommit(key, cid) {
+  if (!confirm('¿Eliminar este registro?')) return;
+  const e = db.employees.find(e => e.id === currentEmpId);
+  if (!e || !e[key]) return;
+  e[key] = e[key].filter(x => x.id !== cid);
+  save(db); renderEmployee(); toast('Eliminado');
+}
+
+// ── MODAL HELPERS ─────────────────────────────────────────────────────────────
+function openModal(id) { document.getElementById(id).classList.add('open'); }
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+
+// click outside to close
+document.querySelectorAll('.modal-overlay').forEach(o => {
+  o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); });
+});
+
+// ── UTILS ─────────────────────────────────────────────────────────────────────
+function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
+
+function fmtDate(d) {
+  if (!d) return '—';
+  const [y,m,day] = d.split('-');
+  return `${day}/${m}/${y}`;
+}
+
+function calcAge(dateStr) {
+  const born = new Date(dateStr);
+  const now = new Date();
+  return Math.floor((now - born) / (365.25*24*60*60*1000));
+}
+
+function slugify(s) { return (s||'').toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,''); }
+
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+// ── BOOT ──────────────────────────────────────────────────────────────────────
+renderHome();
+</script>
+</body>
+</html>
