@@ -2,7 +2,7 @@ name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: [main, claude/voting-app-projects-x6LDZ]
+    branches: [main, claude/voting-app-projects-x6LDZ, claude/employee-lifecycle-app-aeEBi]
   workflow_dispatch:
 
 permissions:
