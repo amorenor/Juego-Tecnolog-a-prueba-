@@ -178,7 +178,60 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica N
 .toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--surface3);border:1px solid var(--border);border-radius:var(--r-sm);padding:10px 20px;font-size:0.88rem;color:var(--text-bright);opacity:0;transition:all .3s;z-index:300;pointer-events:none;white-space:nowrap;}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 
+/* PLANNER */
+.week-nav{display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:20px;}
+.week-nav h3{font-size:1rem;font-weight:700;color:var(--text-bright);min-width:220px;text-align:center;}
+.week-nav-btn{background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:7px 16px;border-radius:var(--r-sm);cursor:pointer;font-size:.9rem;}
+.week-nav-btn:hover{border-color:var(--accent);color:var(--accent);}
+.team-tabs{display:flex;gap:6px;margin-bottom:16px;overflow-x:auto;padding-bottom:4px;}
+.team-tab{padding:6px 14px;border:1px solid var(--border2);border-radius:20px;background:var(--surface2);color:var(--text-muted);font-size:.8rem;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .18s;}
+.team-tab.active{border-color:var(--accent);color:var(--accent);}
+.planner-wrap{overflow-x:auto;margin-bottom:12px;}
+.planner-table{width:100%;border-collapse:collapse;min-width:560px;}
+.planner-table th{font-size:.7rem;font-weight:700;color:var(--text-muted);text-align:center;padding:8px 3px;background:var(--surface2);border-bottom:1px solid var(--border);}
+.planner-table th.col-name{text-align:left;padding-left:12px;min-width:140px;}
+.planner-table th.col-holiday{color:var(--danger);background:rgba(239,68,68,0.07);}
+.planner-table th.col-weekend{color:var(--text-muted);opacity:.6;}
+.planner-table td{padding:6px 3px;border-bottom:1px solid var(--border2);vertical-align:middle;}
+.planner-table td.col-name{padding-left:12px;}
+.p-name{font-size:.83rem;font-weight:600;color:var(--text-bright);}
+.p-role{font-size:.7rem;color:var(--text-muted);}
+.day-btns{display:flex;gap:2px;justify-content:center;}
+.day-btn{width:26px;height:26px;border-radius:6px;border:1px solid var(--border2);background:var(--surface2);color:var(--text-muted);font-size:.68rem;font-weight:700;cursor:pointer;transition:all .15s;}
+.day-btn:hover:not(:disabled){border-color:var(--accent);}
+.day-btn.on-T{background:var(--accent);border-color:var(--accent);color:#fff;}
+.day-btn.on-V{background:var(--success);border-color:var(--success);color:#fff;}
+.day-btn.on-C{background:var(--warning);border-color:var(--warning);color:#000;}
+.day-btn:disabled{opacity:.2;cursor:not-allowed;}
+.planner-legend{font-size:.72rem;color:var(--text-muted);display:flex;flex-wrap:wrap;gap:12px;padding:8px 0;}
+.planner-legend span{display:flex;align-items:center;gap:4px;}
+.l-T{color:var(--accent);}
+.l-V{color:var(--success);}
+.l-C{color:var(--warning);}
+.planner-restriction{font-size:.72rem;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:var(--r-sm);padding:8px 12px;color:var(--warning);margin-bottom:12px;}
+/* CALENDAR */
+.cal-header-row{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:3px;}
+.cal-header-cell{text-align:center;font-size:.7rem;font-weight:700;color:var(--text-muted);padding:5px 0;text-transform:uppercase;}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;}
+.cal-day{background:var(--surface);border:1px solid var(--border2);border-radius:var(--r-sm);min-height:76px;padding:6px;cursor:pointer;transition:border-color .15s;display:flex;flex-direction:column;}
+.cal-day:hover:not(.other-month){border-color:var(--accent);}
+.cal-day.other-month{opacity:.25;pointer-events:none;}
+.cal-day.weekend{background:var(--surface2);}
+.cal-day.holiday{background:rgba(239,68,68,0.07);border-color:rgba(239,68,68,0.28);}
+.cal-day.today{border-color:var(--accent);}
+.cal-num{font-size:.78rem;font-weight:700;color:var(--text-muted);}
+.cal-day.today .cal-num{color:var(--accent);}
+.cal-day.holiday .cal-num{color:var(--danger);}
+.cal-hday{font-size:.58rem;color:var(--danger);line-height:1.2;margin-top:1px;}
+.cal-chips{display:flex;flex-direction:column;gap:2px;margin-top:4px;flex:1;}
+.cal-chip{font-size:.6rem;line-height:1.3;}
+.cal-chip-T{color:var(--accent);}
+.cal-chip-V{color:var(--success);}
+.cal-chip-C{color:var(--warning);}
+.cal-legend{display:flex;gap:16px;font-size:.75rem;color:var(--text-muted);margin-top:12px;flex-wrap:wrap;}
 @media(max-width:600px){
+  .cal-day{min-height:52px;padding:4px;}
+  .cal-chips{display:none;}
   .stats-row{grid-template-columns:repeat(2,1fr);}
   .grid-2{grid-template-columns:1fr;}
   .profile-hero{flex-direction:column;text-align:center;}
@@ -313,6 +366,54 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica N
 </div>
 </div>
 
+<!-- PLANNER SCREEN -->
+<div class="screen" id="screen-planner">
+<div class="container">
+  <div class="app-header" style="padding:24px 0 16px">
+    <div class="app-logo" style="font-size:1.3rem">📋 Planificación Semanal</div>
+    <div class="app-tagline">Teletrabajo · Vacaciones · Días Compensados</div>
+  </div>
+  <div class="week-nav">
+    <button class="week-nav-btn" onclick="changeWeek(-1)">←</button>
+    <h3 id="week-label"></h3>
+    <button class="week-nav-btn" onclick="changeWeek(1)">→</button>
+  </div>
+  <div id="holiday-alert"></div>
+  <div class="planner-restriction">⚠️ Restricciones teletrabajo: <b>Lun–Jue</b> máx. 2 personas/equipo · <b>Viernes</b> máx. 1 persona/equipo</div>
+  <div class="team-tabs" id="planner-tabs"></div>
+  <div class="planner-wrap">
+    <table class="planner-table" id="planner-table"></table>
+  </div>
+  <div class="planner-legend">
+    <span><span class="day-btn on-T" style="display:inline-flex;align-items:center;justify-content:center;pointer-events:none">T</span> <span class="l-T">Teletrabajo</span></span>
+    <span><span class="day-btn on-V" style="display:inline-flex;align-items:center;justify-content:center;pointer-events:none">V</span> <span class="l-V">Vacaciones</span></span>
+    <span><span class="day-btn on-C" style="display:inline-flex;align-items:center;justify-content:center;pointer-events:none">C</span> <span class="l-C">Compensado</span></span>
+    <span style="color:var(--text-muted)">Gris = feriado / fin de semana (T y C deshabilitados)</span>
+  </div>
+</div>
+</div>
+
+<!-- CALENDAR SCREEN -->
+<div class="screen" id="screen-calendar">
+<div class="container">
+  <div class="app-header" style="padding:24px 0 16px">
+    <div class="app-logo" style="font-size:1.3rem">📅 Vista de Gerencia</div>
+    <div class="app-tagline">Consolidado del equipo · 2026</div>
+  </div>
+  <div class="week-nav">
+    <button class="week-nav-btn" onclick="changeMonth(-1)">←</button>
+    <h3 id="cal-month-label"></h3>
+    <button class="week-nav-btn" onclick="changeMonth(1)">→</button>
+  </div>
+  <div class="cal-header-row" id="cal-header"></div>
+  <div class="cal-grid" id="cal-grid"></div>
+  <div class="cal-legend">
+    <span>💻 Teletrabajo</span><span>🌴 Vacaciones</span><span>📅 Compensado</span>
+    <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:rgba(239,68,68,0.25);display:inline-block"></span>Festivo</span>
+  </div>
+</div>
+</div>
+
 <!-- MODALS -->
 
 <!-- TEAM FORM -->
@@ -440,6 +541,36 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica N
 </div>
 </div>
 
+<!-- COMPENSADO MODAL -->
+<div class="modal-overlay" id="modal-compensado">
+<div class="modal" style="max-width:420px">
+  <div class="modal-hdr">
+    <h3 id="comp-modal-title">Día Compensado</h3>
+    <button class="modal-close" onclick="cancelCompensado()">×</button>
+  </div>
+  <div class="modal-body">
+    <div class="field"><label>Motivo del día compensado</label>
+      <textarea id="comp-motivo" rows="3" placeholder="Ej: Compensación por trabajo en feriado, horas extras, etc."></textarea>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:12px">
+      <button class="btn btn-primary btn-full" onclick="saveCompensado()">Guardar</button>
+      <button class="btn btn-ghost" onclick="cancelCompensado()">Cancelar</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- DAY DETAIL MODAL -->
+<div class="modal-overlay" id="modal-day">
+<div class="modal">
+  <div class="modal-hdr">
+    <h3 id="day-modal-title">Detalle del día</h3>
+    <button class="modal-close" onclick="closeModal('modal-day')">×</button>
+  </div>
+  <div class="modal-body" id="day-modal-body"></div>
+</div>
+</div>
+
 <!-- NAV BAR -->
 <nav class="nav-bar">
   <button class="nav-btn active" id="nav-home" onclick="showScreen('home');setNav('nav-home')">
@@ -451,6 +582,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica N
   <button class="nav-btn" id="nav-emp" onclick="showScreen('employee');setNav('nav-emp')" style="display:none">
     <span class="nav-icon">👤</span><span>Persona</span>
   </button>
+  <button class="nav-btn" id="nav-planner" onclick="showScreen('planner');setNav('nav-planner')">
+    <span class="nav-icon">📋</span><span>Semana</span>
+  </button>
+  <button class="nav-btn" id="nav-calendar" onclick="showScreen('calendar');setNav('nav-calendar')">
+    <span class="nav-icon">📅</span><span>Gerencia</span>
+  </button>
 </nav>
 
 <script>
@@ -458,8 +595,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica N
 const STORE_KEY = 'eq_mgr_v1';
 
 function load() {
-  try { return JSON.parse(localStorage.getItem(STORE_KEY)) || defaultData(); }
-  catch(e) { return defaultData(); }
+  try {
+    const data = JSON.parse(localStorage.getItem(STORE_KEY)) || defaultData();
+    if (!data.attendance) data.attendance = [];
+    return data;
+  } catch(e) { return defaultData(); }
 }
 
 function save(db) { localStorage.setItem(STORE_KEY, JSON.stringify(db)); }
@@ -473,7 +613,8 @@ function defaultData() {
       { id: 't4', name: 'Seguridad', color: '#ef4444', leadId: '', desc: '' },
       { id: 't5', name: 'Soporte', color: '#f59e0b', leadId: '', desc: '' }
     ],
-    employees: []
+    employees: [],
+    attendance: []
   };
 }
 
@@ -490,6 +631,8 @@ function showScreen(name) {
   if (name === 'home') renderHome();
   if (name === 'team') renderTeam();
   if (name === 'employee') renderEmployee();
+  if (name === 'planner') renderPlanner();
+  if (name === 'calendar') renderCalendar();
 }
 
 function setNav(id) {
@@ -1094,6 +1237,283 @@ function renderNews() {
         <div class="news-desc">${n.desc}</div>
       </div>
     </div>`).join('');
+}
+
+// ── ATTENDANCE & PLANNER ─────────────────────────────────────────────────────
+const HOLIDAYS = {
+  '2026-01-01':'Año Nuevo',
+  '2026-04-03':'Viernes Santo',
+  '2026-04-04':'Sábado Santo',
+  '2026-05-01':'Día del Trabajo',
+  '2026-05-21':'Glorias Navales',
+  '2026-06-29':'San Pedro y San Pablo',
+  '2026-07-16':'Virgen del Carmen',
+  '2026-08-15':'Asunción de la Virgen',
+  '2026-09-18':'Fiestas Patrias',
+  '2026-09-19':'Día del Ejército',
+  '2026-10-12':'Día de la Raza',
+  '2026-11-01':'Todos los Santos',
+  '2026-12-08':'Inmaculada Concepción',
+  '2026-12-25':'Navidad',
+};
+
+function toDs(d) {
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+}
+function isWeekend(ds) { const w=new Date(ds+'T12:00:00').getDay(); return w===0||w===6; }
+function isHoliday(ds) { return !!HOLIDAYS[ds]; }
+function isWorkday(ds) { return !isWeekend(ds) && !isHoliday(ds); }
+
+let plannerWeek = getMondayOf(new Date());
+let plannerTeam = 'all';
+let pendingComp = null;
+
+function getMondayOf(d) {
+  const r = new Date(d); r.setHours(0,0,0,0);
+  const w = r.getDay(); r.setDate(r.getDate() - (w===0?6:w-1));
+  return r;
+}
+
+function weekDates(monday) {
+  return Array.from({length:7}, (_,i) => { const d=new Date(monday); d.setDate(d.getDate()+i); return toDs(d); });
+}
+
+function changeWeek(dir) {
+  plannerWeek = new Date(plannerWeek);
+  plannerWeek.setDate(plannerWeek.getDate() + dir*7);
+  renderPlanner();
+}
+
+function renderPlanner() {
+  const dates = weekDates(plannerWeek);
+  const DNAMES = ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
+  const MONTHS = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+  const d0 = new Date(dates[0]+'T12:00:00'), d6 = new Date(dates[6]+'T12:00:00');
+  document.getElementById('week-label').textContent =
+    `${d0.getDate()} ${MONTHS[d0.getMonth()]} – ${d6.getDate()} ${MONTHS[d6.getMonth()]} ${d6.getFullYear()}`;
+
+  const hdaysThisWeek = dates.filter(d => HOLIDAYS[d]);
+  document.getElementById('holiday-alert').innerHTML = hdaysThisWeek.map(d =>
+    `<div class="alert alert-warn" style="margin-bottom:6px">🎌 <b>${HOLIDAYS[d]}</b> — ${fmtDate(d)}</div>`).join('');
+
+  // Team tabs
+  document.getElementById('planner-tabs').innerHTML =
+    `<div class="team-tab${plannerTeam==='all'?' active':''}" onclick="setPlannerTeam('all')">Todos los equipos</div>` +
+    db.teams.map(t => `<div class="team-tab${plannerTeam===t.id?' active':''}" onclick="setPlannerTeam('${t.id}')"
+      style="${plannerTeam===t.id?`border-color:${t.color};color:${t.color}`:''}">
+      ${t.name}</div>`).join('');
+
+  const emps = plannerTeam==='all' ? [...db.employees] : db.employees.filter(e=>e.teamId===plannerTeam);
+  // Sort by team then name
+  emps.sort((a,b)=>(a.teamId+a.apellido).localeCompare(b.teamId+b.apellido));
+
+  if (!emps.length) {
+    document.getElementById('planner-table').innerHTML =
+      '<tr><td style="text-align:center;padding:32px;color:var(--text-muted)">Sin personas para mostrar</td></tr>';
+    return;
+  }
+
+  const thead = `<thead><tr>
+    <th class="col-name">Persona</th>
+    ${dates.map((d,i) => {
+      const hw = HOLIDAYS[d]; const we = isWeekend(d);
+      return `<th class="${hw?'col-holiday':we?'col-weekend':''}">${DNAMES[i]}<br>
+        <span style="font-weight:400;font-size:.78em">${d.split('-')[2]}</span>
+        ${hw?`<br><span style="font-size:.6em;font-weight:400">${hw.split(' ').slice(0,2).join(' ')}</span>`:''}
+      </th>`;
+    }).join('')}
+  </tr></thead>`;
+
+  const tbody = emps.map(e => {
+    const team = db.teams.find(t=>t.id===e.teamId);
+    const cells = dates.map(d => {
+      const wd = isWorkday(d); const we = isWeekend(d); const hd = !!HOLIDAYS[d];
+      const sT = getAtt(e.id,d,'teletrabajo');
+      const sV = getAtt(e.id,d,'vacaciones');
+      const sC = getAtt(e.id,d,'compensado');
+      // Teletrabajo restriction check
+      const dow = new Date(d+'T12:00:00').getDay();
+      const limit = dow===5 ? 1 : 2;
+      const teamTele = (db.attendance||[]).filter(a=>a.type==='teletrabajo'&&a.date===d&&a.teamId===e.teamId&&a.empId!==e.id).length;
+      const tBlocked = !wd || (!!sV||!!sC) || (!sT && teamTele>=limit);
+      const vCanSet = !we; // vacaciones allowed on holidays too (legally counted)
+      const cBlocked = !wd || !!sV;
+      const bg = (we||hd)?'background:var(--surface3)':'';
+      return `<td style="${bg}">
+        <div class="day-btns">
+          <button class="day-btn${sT?' on-T':''}" ${tBlocked&&!sT?'disabled':''}
+            onclick="toggleAtt('${e.id}','${d}','teletrabajo')" title="Teletrabajo${teamTele>=limit&&!sT?' (límite alcanzado)':''}">T</button>
+          <button class="day-btn${sV?' on-V':''}" ${!vCanSet&&!sV?'disabled':''}
+            onclick="toggleAtt('${e.id}','${d}','vacaciones')" title="Vacaciones">V</button>
+          <button class="day-btn${sC?' on-C':''}" ${cBlocked&&!sC?'disabled':''}
+            onclick="toggleAtt('${e.id}','${d}','compensado')" title="Compensado">C</button>
+        </div>
+        ${sC&&sC.motivo?`<div style="font-size:.58rem;color:var(--warning);text-align:center;margin-top:2px;line-height:1.2">${sC.motivo.slice(0,18)}${sC.motivo.length>18?'…':''}</div>`:''}
+      </td>`;
+    }).join('');
+    return `<tr>
+      <td class="col-name">
+        <div class="p-name">${e.nombre} ${e.apellido}</div>
+        <div class="p-role">${e.cargo||''}${team?` · <span style="color:${team.color}">${team.name}</span>`:''}</div>
+      </td>${cells}
+    </tr>`;
+  }).join('');
+
+  document.getElementById('planner-table').innerHTML = thead + `<tbody>${tbody}</tbody>`;
+}
+
+function setPlannerTeam(id) { plannerTeam = id; renderPlanner(); }
+
+function getAtt(empId, date, type) {
+  return (db.attendance||[]).find(a=>a.empId===empId&&a.date===date&&a.type===type)||null;
+}
+
+function toggleAtt(empId, date, type) {
+  if (!db.attendance) db.attendance = [];
+  const existing = getAtt(empId, date, type);
+
+  if (type === 'compensado') {
+    if (existing) {
+      db.attendance = db.attendance.filter(a=>!(a.empId===empId&&a.date===date&&a.type===type));
+      save(db); renderPlanner(); return;
+    }
+    pendingComp = { empId, date };
+    document.getElementById('comp-motivo').value = '';
+    const emp = db.employees.find(e=>e.id===empId);
+    document.getElementById('comp-modal-title').textContent =
+      `Compensado · ${emp?emp.nombre+' '+emp.apellido:''} · ${fmtDate(date)}`;
+    openModal('modal-compensado'); return;
+  }
+
+  if (existing) {
+    db.attendance = db.attendance.filter(a=>!(a.empId===empId&&a.date===date&&a.type===type));
+  } else {
+    // Validate teletrabajo restriction
+    if (type === 'teletrabajo') {
+      const emp = db.employees.find(e=>e.id===empId);
+      const dow = new Date(date+'T12:00:00').getDay();
+      const limit = dow===5 ? 1 : 2;
+      const count = db.attendance.filter(a=>a.type==='teletrabajo'&&a.date===date&&a.teamId===emp.teamId&&a.empId!==empId).length;
+      if (count >= limit) {
+        toast(`⚠️ ${dow===5?'Viernes: máx. 1':'Máx. 2'} personas de ${db.teams.find(t=>t.id===emp.teamId)?.name||'este equipo'} en teletrabajo`);
+        return;
+      }
+    }
+    // Mutually exclusive: remove other types
+    db.attendance = db.attendance.filter(a=>!(a.empId===empId&&a.date===date));
+    const emp = db.employees.find(e=>e.id===empId);
+    db.attendance.push({ id:uid(), empId, teamId:emp.teamId, date, type, motivo:'' });
+  }
+  save(db); renderPlanner();
+}
+
+function saveCompensado() {
+  const motivo = document.getElementById('comp-motivo').value.trim();
+  if (!motivo) { toast('Escribe el motivo del día compensado'); return; }
+  const { empId, date } = pendingComp;
+  db.attendance = db.attendance.filter(a=>!(a.empId===empId&&a.date===date));
+  const emp = db.employees.find(e=>e.id===empId);
+  db.attendance.push({ id:uid(), empId, teamId:emp.teamId, date, type:'compensado', motivo });
+  save(db); closeModal('modal-compensado'); pendingComp = null;
+  renderPlanner(); toast('Día compensado guardado');
+}
+
+function cancelCompensado() {
+  pendingComp = null;
+  closeModal('modal-compensado');
+}
+
+// ── CALENDAR ──────────────────────────────────────────────────────────────────
+let calYear = new Date().getFullYear();
+let calMonth = new Date().getMonth();
+
+function changeMonth(dir) {
+  calMonth += dir;
+  if (calMonth>11){calMonth=0;calYear++;}
+  if (calMonth<0){calMonth=11;calYear--;}
+  renderCalendar();
+}
+
+function renderCalendar() {
+  const MNAMES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  const DNAMES = ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
+  document.getElementById('cal-month-label').textContent = `${MNAMES[calMonth]} ${calYear}`;
+  document.getElementById('cal-header').innerHTML = DNAMES.map(d=>`<div class="cal-header-cell">${d}</div>`).join('');
+
+  const today = new Date(); today.setHours(0,0,0,0);
+  const todayDs = toDs(today);
+  const firstDow = new Date(calYear,calMonth,1).getDay(); // 0=Sun
+  const startOffset = firstDow===0 ? 6 : firstDow-1; // Mon=0
+  const daysInMonth = new Date(calYear,calMonth+1,0).getDate();
+
+  const cells = [];
+  // Prev month fill
+  const prevM = calMonth===0?11:calMonth-1, prevY = calMonth===0?calYear-1:calYear;
+  const dInPrev = new Date(prevY,prevM+1,0).getDate();
+  for (let i=startOffset-1;i>=0;i--) cells.push({ ds:toDs(new Date(prevY,prevM,dInPrev-i)), other:true });
+  // Current month
+  for (let d=1;d<=daysInMonth;d++) cells.push({ ds:toDs(new Date(calYear,calMonth,d)), other:false });
+  // Next month fill
+  const nextM = calMonth===11?0:calMonth+1, nextY = calMonth===11?calYear+1:calYear;
+  let nd=1; while(cells.length<42) cells.push({ ds:toDs(new Date(nextY,nextM,nd++)), other:true });
+
+  document.getElementById('cal-grid').innerHTML = cells.map(({ds,other})=>{
+    const d = new Date(ds+'T12:00:00');
+    const we = d.getDay()===0||d.getDay()===6;
+    const hw = HOLIDAYS[ds];
+    const isT = ds===todayDs;
+    let cls='cal-day';
+    if(other) cls+=' other-month';
+    else { if(we) cls+=' weekend'; if(hw) cls+=' holiday'; if(isT) cls+=' today'; }
+    const att = (db.attendance||[]).filter(a=>a.date===ds);
+    const tele=att.filter(a=>a.type==='teletrabajo');
+    const vac=att.filter(a=>a.type==='vacaciones');
+    const comp=att.filter(a=>a.type==='compensado');
+    return `<div class="${cls}" onclick="showDayDetail('${ds}')">
+      <div class="cal-num">${d.getDate()}</div>
+      ${hw?`<div class="cal-hday">${hw}</div>`:''}
+      <div class="cal-chips">
+        ${tele.length?`<div class="cal-chip cal-chip-T">💻 ${tele.length} teletrabajo</div>`:''}
+        ${vac.length?`<div class="cal-chip cal-chip-V">🌴 ${vac.length} vacaciones</div>`:''}
+        ${comp.length?`<div class="cal-chip cal-chip-C">📅 ${comp.length} compensado</div>`:''}
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function showDayDetail(ds) {
+  if (!ds) return;
+  const hw = HOLIDAYS[ds];
+  const we = new Date(ds+'T12:00:00').getDay();
+  const weStr = we===0?'Domingo':we===6?'Sábado':'';
+  document.getElementById('day-modal-title').textContent =
+    `${fmtDate(ds)}${weStr?' · '+weStr:''}${hw?' · '+hw:''}`;
+  const att = (db.attendance||[]).filter(a=>a.date===ds);
+  const types = [
+    {key:'teletrabajo',label:'Teletrabajo',icon:'💻'},
+    {key:'vacaciones',label:'Vacaciones',icon:'🌴'},
+    {key:'compensado',label:'Días Compensados',icon:'📅'},
+  ];
+  let html='';
+  types.forEach(({key,label,icon})=>{
+    const items=att.filter(a=>a.type===key);
+    if(!items.length) return;
+    html+=`<div class="section-lbl" style="margin-top:${html?'16px':'0'}">${icon} ${label} (${items.length})</div>`;
+    html+=items.map(a=>{
+      const emp=db.employees.find(e=>e.id===a.empId);
+      const team=db.teams.find(t=>t.id===a.teamId);
+      return `<div style="display:flex;justify-content:space-between;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--border2)">
+        <div>
+          <div style="font-size:.88rem;font-weight:600;color:var(--text-bright)">${emp?emp.nombre+' '+emp.apellido:'—'}</div>
+          <div style="font-size:.75rem;color:var(--text-muted)">${emp?.cargo||''}${team?` · <span style="color:${team.color}">${team.name}</span>`:''}</div>
+          ${a.motivo?`<div style="font-size:.75rem;color:var(--warning);margin-top:2px">📝 ${a.motivo}</div>`:''}
+        </div>
+      </div>`;
+    }).join('');
+  });
+  if(!html) html='<div class="empty"><div class="empty-icon">📭</div><p>Sin registros para este día</p></div>';
+  document.getElementById('day-modal-body').innerHTML=html;
+  openModal('modal-day');
 }
 
 // ── UTILS ─────────────────────────────────────────────────────────────────────
