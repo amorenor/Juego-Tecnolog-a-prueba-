@@ -178,6 +178,20 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica N
 .toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--surface3);border:1px solid var(--border);border-radius:var(--r-sm);padding:10px 20px;font-size:0.88rem;color:var(--text-bright);opacity:0;transition:all .3s;z-index:300;pointer-events:none;white-space:nowrap;}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 
+/* LOGIN */
+.login-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;margin-top:8px;}
+.login-card{background:var(--surface);border:1.5px solid var(--border2);border-radius:var(--r);padding:24px 20px;cursor:pointer;transition:all .22s;text-align:center;}
+.login-card:hover{border-color:var(--accent);transform:translateY(-3px);box-shadow:0 10px 30px var(--glow);}
+.login-card.manager{border-color:rgba(251,191,36,0.35);}
+.login-card.manager:hover{border-color:#fbbf24;}
+.login-avatar{width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff;font-size:1.4rem;font-weight:800;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;}
+.login-avatar.gold{background:linear-gradient(135deg,#b45309,#fbbf24);}
+.login-name{font-weight:700;color:var(--text-bright);font-size:1rem;margin-bottom:4px;}
+.login-role{font-size:.78rem;color:var(--text-muted);}
+.user-badge{display:inline-flex;align-items:center;gap:8px;background:var(--surface2);border:1px solid var(--border2);border-radius:20px;padding:6px 14px;font-size:.8rem;color:var(--text);margin-bottom:16px;}
+.user-badge strong{color:var(--text-bright);}
+.user-badge button{background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:.8rem;padding:0 0 0 6px;}
+.user-badge button:hover{color:var(--danger);}
 /* PLANNER */
 .week-nav{display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:20px;}
 .week-nav h3{font-size:1rem;font-weight:700;color:var(--text-bright);min-width:220px;text-align:center;}
@@ -243,8 +257,19 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica N
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
 
+<!-- LOGIN SCREEN -->
+<div class="screen active" id="screen-login">
+<div class="container">
+  <div class="app-header">
+    <div class="app-logo">👥 Mi Equipo</div>
+    <div class="app-tagline">AquaChile · ¿Quién eres?</div>
+  </div>
+  <div id="login-list"></div>
+</div>
+</div>
+
 <!-- HOME SCREEN -->
-<div class="screen active" id="screen-home">
+<div class="screen" id="screen-home">
 <div class="container">
   <div class="app-header">
     <div class="app-logo">👥 Mi Equipo</div>
@@ -369,10 +394,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica N
 <!-- PLANNER SCREEN -->
 <div class="screen" id="screen-planner">
 <div class="container">
-  <div class="app-header" style="padding:24px 0 16px">
+  <div class="app-header" style="padding:24px 0 12px">
     <div class="app-logo" style="font-size:1.3rem">📋 Planificación Semanal</div>
-    <div class="app-tagline">Teletrabajo · Vacaciones · Días Compensados</div>
   </div>
+  <div id="planner-user-badge"></div>
   <div class="week-nav">
     <button class="week-nav-btn" onclick="changeWeek(-1)">←</button>
     <h3 id="week-label"></h3>
@@ -396,17 +421,22 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica N
 <!-- CALENDAR SCREEN -->
 <div class="screen" id="screen-calendar">
 <div class="container">
-  <div class="app-header" style="padding:24px 0 16px">
+  <div class="app-header" style="padding:24px 0 12px">
     <div class="app-logo" style="font-size:1.3rem">📅 Vista de Gerencia</div>
-    <div class="app-tagline">Consolidado del equipo · 2026</div>
   </div>
   <div class="week-nav">
     <button class="week-nav-btn" onclick="changeMonth(-1)">←</button>
     <h3 id="cal-month-label"></h3>
     <button class="week-nav-btn" onclick="changeMonth(1)">→</button>
   </div>
+  <div style="display:flex;gap:8px;margin-bottom:14px;">
+    <button id="cal-btn-full" class="btn btn-sm btn-primary" onclick="setCalView('full')">Semana completa (L–D)</button>
+    <button id="cal-btn-work" class="btn btn-sm btn-ghost" onclick="setCalView('work')">Semana laboral (L–V)</button>
+  </div>
+  <div id="cal-wrap">
   <div class="cal-header-row" id="cal-header"></div>
   <div class="cal-grid" id="cal-grid"></div>
+  </div>
   <div class="cal-legend">
     <span>💻 Teletrabajo</span><span>🌴 Vacaciones</span><span>📅 Compensado</span>
     <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:rgba(239,68,68,0.25);display:inline-block"></span>Festivo</span>
@@ -633,6 +663,7 @@ function showScreen(name) {
   if (name === 'employee') renderEmployee();
   if (name === 'planner') renderPlanner();
   if (name === 'calendar') renderCalendar();
+  if (name === 'login') renderLogin();
 }
 
 function setNav(id) {
@@ -1285,6 +1316,22 @@ function changeWeek(dir) {
 }
 
 function renderPlanner() {
+  const user = getCurrentUser();
+  const isLeader = user && user.type === 'leader';
+
+  // User badge
+  const badge = document.getElementById('planner-user-badge');
+  if (user) {
+    badge.innerHTML = `<div class="user-badge">
+      ${isLeader?'👥':'⭐'} Ingresando como <strong>${user.name}</strong>
+      ${isLeader?`<span style="color:${db.teams.find(t=>t.id===user.teamId)?.color||'var(--accent)'}"> · ${db.teams.find(t=>t.id===user.teamId)?.name||''}</span>`:''}
+      <button onclick="doLogout()" title="Salir">Salir</button>
+    </div>`;
+  } else { badge.innerHTML = ''; }
+
+  // Enforce team for leaders
+  if (isLeader) plannerTeam = user.teamId;
+
   const dates = weekDates(plannerWeek);
   const DNAMES = ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
   const MONTHS = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
@@ -1296,14 +1343,20 @@ function renderPlanner() {
   document.getElementById('holiday-alert').innerHTML = hdaysThisWeek.map(d =>
     `<div class="alert alert-warn" style="margin-bottom:6px">🎌 <b>${HOLIDAYS[d]}</b> — ${fmtDate(d)}</div>`).join('');
 
-  // Team tabs
-  document.getElementById('planner-tabs').innerHTML =
-    `<div class="team-tab${plannerTeam==='all'?' active':''}" onclick="setPlannerTeam('all')">Todos los equipos</div>` +
-    db.teams.map(t => `<div class="team-tab${plannerTeam===t.id?' active':''}" onclick="setPlannerTeam('${t.id}')"
-      style="${plannerTeam===t.id?`border-color:${t.color};color:${t.color}`:''}">
-      ${t.name}</div>`).join('');
+  // Team tabs: only for manager
+  const tabsEl = document.getElementById('planner-tabs');
+  if (isLeader) {
+    tabsEl.innerHTML = '';
+  } else {
+    tabsEl.innerHTML =
+      `<div class="team-tab${plannerTeam==='all'?' active':''}" onclick="setPlannerTeam('all')">Todos los equipos</div>` +
+      db.teams.map(t => `<div class="team-tab${plannerTeam===t.id?' active':''}" onclick="setPlannerTeam('${t.id}')"
+        style="${plannerTeam===t.id?`border-color:${t.color};color:${t.color}`:''}">
+        ${t.name}</div>`).join('');
+  }
 
   const emps = plannerTeam==='all' ? [...db.employees] : db.employees.filter(e=>e.teamId===plannerTeam);
+  const readonly = user && user.type === 'manager';
   // Sort by team then name
   emps.sort((a,b)=>(a.teamId+a.apellido).localeCompare(b.teamId+b.apellido));
 
@@ -1339,14 +1392,18 @@ function renderPlanner() {
       const vCanSet = !we; // vacaciones allowed on holidays too (legally counted)
       const cBlocked = !wd || !!sV;
       const bg = (we||hd)?'background:var(--surface3)':'';
-      return `<td style="${bg}">
+      const canEdit = !readonly;
+      const clickT = canEdit ? `onclick="toggleAtt('${e.id}','${d}','teletrabajo')"` : '';
+      const clickV = canEdit ? `onclick="toggleAtt('${e.id}','${d}','vacaciones')"` : '';
+      const clickC = canEdit ? `onclick="toggleAtt('${e.id}','${d}','compensado')"` : '';
+      return `<td style="${bg}${readonly?' opacity:.85':''}">
         <div class="day-btns">
-          <button class="day-btn${sT?' on-T':''}" ${tBlocked&&!sT?'disabled':''}
-            onclick="toggleAtt('${e.id}','${d}','teletrabajo')" title="Teletrabajo${teamTele>=limit&&!sT?' (límite alcanzado)':''}">T</button>
-          <button class="day-btn${sV?' on-V':''}" ${!vCanSet&&!sV?'disabled':''}
-            onclick="toggleAtt('${e.id}','${d}','vacaciones')" title="Vacaciones">V</button>
-          <button class="day-btn${sC?' on-C':''}" ${cBlocked&&!sC?'disabled':''}
-            onclick="toggleAtt('${e.id}','${d}','compensado')" title="Compensado">C</button>
+          <button class="day-btn${sT?' on-T':''}" ${(tBlocked&&!sT)||readonly?'disabled':''}
+            ${clickT} title="Teletrabajo${teamTele>=limit&&!sT?' (límite alcanzado)':''}">T</button>
+          <button class="day-btn${sV?' on-V':''}" ${(!vCanSet&&!sV)||readonly?'disabled':''}
+            ${clickV} title="Vacaciones">V</button>
+          <button class="day-btn${sC?' on-C':''}" ${(cBlocked&&!sC)||readonly?'disabled':''}
+            ${clickC} title="Compensado">C</button>
         </div>
         ${sC&&sC.motivo?`<div style="font-size:.58rem;color:var(--warning);text-align:center;margin-top:2px;line-height:1.2">${sC.motivo.slice(0,18)}${sC.motivo.length>18?'…':''}</div>`:''}
       </td>`;
@@ -1426,6 +1483,14 @@ function cancelCompensado() {
 // ── CALENDAR ──────────────────────────────────────────────────────────────────
 let calYear = new Date().getFullYear();
 let calMonth = new Date().getMonth();
+let calViewMode = 'full'; // 'full' | 'work'
+
+function setCalView(mode) {
+  calViewMode = mode;
+  document.getElementById('cal-btn-full').className = 'btn btn-sm ' + (mode==='full'?'btn-primary':'btn-ghost');
+  document.getElementById('cal-btn-work').className = 'btn btn-sm ' + (mode==='work'?'btn-primary':'btn-ghost');
+  renderCalendar();
+}
 
 function changeMonth(dir) {
   calMonth += dir;
@@ -1436,26 +1501,30 @@ function changeMonth(dir) {
 
 function renderCalendar() {
   const MNAMES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
-  const DNAMES = ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
+  const isWork = calViewMode === 'work';
+  const DNAMES = isWork ? ['Lun','Mar','Mié','Jue','Vie'] : ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
+  const cols = isWork ? 5 : 7;
   document.getElementById('cal-month-label').textContent = `${MNAMES[calMonth]} ${calYear}`;
+  document.getElementById('cal-header').style.gridTemplateColumns = `repeat(${cols},1fr)`;
+  document.getElementById('cal-grid').style.gridTemplateColumns = `repeat(${cols},1fr)`;
   document.getElementById('cal-header').innerHTML = DNAMES.map(d=>`<div class="cal-header-cell">${d}</div>`).join('');
 
   const today = new Date(); today.setHours(0,0,0,0);
   const todayDs = toDs(today);
-  const firstDow = new Date(calYear,calMonth,1).getDay(); // 0=Sun
+  const firstDow = new Date(calYear,calMonth,1).getDay();
   const startOffset = firstDow===0 ? 6 : firstDow-1; // Mon=0
   const daysInMonth = new Date(calYear,calMonth+1,0).getDate();
-
-  const cells = [];
-  // Prev month fill
   const prevM = calMonth===0?11:calMonth-1, prevY = calMonth===0?calYear-1:calYear;
   const dInPrev = new Date(prevY,prevM+1,0).getDate();
-  for (let i=startOffset-1;i>=0;i--) cells.push({ ds:toDs(new Date(prevY,prevM,dInPrev-i)), other:true });
-  // Current month
-  for (let d=1;d<=daysInMonth;d++) cells.push({ ds:toDs(new Date(calYear,calMonth,d)), other:false });
-  // Next month fill
   const nextM = calMonth===11?0:calMonth+1, nextY = calMonth===11?calYear+1:calYear;
-  let nd=1; while(cells.length<42) cells.push({ ds:toDs(new Date(nextY,nextM,nd++)), other:true });
+
+  // Build full 7-col grid, then filter to 5 if work mode
+  const full = [];
+  for (let i=startOffset-1;i>=0;i--) full.push({ ds:toDs(new Date(prevY,prevM,dInPrev-i)), other:true });
+  for (let d=1;d<=daysInMonth;d++) full.push({ ds:toDs(new Date(calYear,calMonth,d)), other:false });
+  let nd=1; while(full.length<42) full.push({ ds:toDs(new Date(nextY,nextM,nd++)), other:true });
+
+  const cells = isWork ? full.filter((_,i) => i%7 < 5) : full;
 
   document.getElementById('cal-grid').innerHTML = cells.map(({ds,other})=>{
     const d = new Date(ds+'T12:00:00');
@@ -1539,8 +1608,60 @@ function toast(msg) {
   setTimeout(() => t.classList.remove('show'), 2200);
 }
 
+// ── LOGIN ─────────────────────────────────────────────────────────────────────
+const SESSION_KEY = 'eq_user_v1';
+
+function getCurrentUser() {
+  try { return JSON.parse(sessionStorage.getItem(SESSION_KEY)); } catch(e) { return null; }
+}
+
+function doLogin(user) {
+  sessionStorage.setItem(SESSION_KEY, JSON.stringify(user));
+  showScreen('home'); setNav('nav-home');
+}
+
+function doLogout() {
+  sessionStorage.removeItem(SESSION_KEY);
+  showScreen('login'); setNav('nav-home');
+}
+
+function renderLogin() {
+  const leaders = db.teams
+    .filter(t => t.leadId)
+    .map(t => ({ team: t, emp: db.employees.find(e => e.id === t.leadId) }))
+    .filter(x => x.emp);
+
+  const managerCard = `
+    <div class="login-card manager" onclick="doLogin({type:'manager',name:'Gerente del Área',empId:null,teamId:null})">
+      <div class="login-avatar gold">⭐</div>
+      <div class="login-name">Gerente del Área</div>
+      <div class="login-role">Acceso completo · Solo lectura en planificador</div>
+    </div>`;
+
+  const leaderCards = leaders.map(({ team, emp }) => {
+    const initials = ((emp.nombre||'?')[0]+(emp.apellido||'')[0]).toUpperCase();
+    return `<div class="login-card" onclick="doLogin({type:'leader',name:'${emp.nombre} ${emp.apellido}',empId:'${emp.id}',teamId:'${team.id}'})"
+        style="border-top:3px solid ${team.color}">
+      <div class="login-avatar">${initials}</div>
+      <div class="login-name">${emp.nombre} ${emp.apellido}</div>
+      <div class="login-role" style="color:${team.color}">${team.name}</div>
+      <div class="login-role" style="margin-top:4px">${emp.cargo||'Líder de equipo'}</div>
+    </div>`;
+  }).join('');
+
+  const noLeadersHint = !leaders.length
+    ? `<div class="alert alert-info" style="margin-top:16px">Para que los líderes puedan ingresar, primero agrega personas a cada equipo y asigna un líder.</div>` : '';
+
+  document.getElementById('login-list').innerHTML =
+    `<div class="login-grid">${managerCard}${leaderCards}</div>${noLeadersHint}`;
+}
+
 // ── BOOT ──────────────────────────────────────────────────────────────────────
-renderHome();
+(function boot() {
+  const user = getCurrentUser();
+  if (user) { showScreen('home'); setNav('nav-home'); }
+  else { renderLogin(); }
+})();
 </script>
 </body>
 </html>
