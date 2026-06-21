@@ -283,6 +283,25 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica N
   .grid-2{grid-template-columns:1fr;}
   .profile-hero{flex-direction:column;text-align:center;}
 }
+/* LOGIN FORM */
+.login-form-wrap{max-width:420px;margin:0 auto;padding:8px 0 32px;}
+.login-form-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:32px 28px;box-shadow:var(--shadow);}
+.login-hint{font-size:.75rem;color:var(--text-muted);text-align:center;margin-top:16px;line-height:1.6;}
+.pw-wrap{position:relative;}
+.pw-wrap input{padding-right:72px;}
+.pw-show{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:.75rem;font-weight:600;}
+.pw-show:hover{color:var(--accent);}
+.login-err{font-size:.82rem;color:var(--danger);text-align:center;margin-bottom:10px;display:none;padding:8px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:var(--r-sm);}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
+/* PERMISOS */
+.user-row{background:var(--surface);border:1px solid var(--border2);border-radius:var(--r-sm);padding:16px;display:flex;align-items:flex-start;gap:14px;margin-bottom:10px;}
+.urb{font-size:.7rem;font-weight:700;padding:2px 8px;border-radius:10px;}
+.urb-manager{background:rgba(251,191,36,.15);color:#fbbf24;}
+.urb-leader{background:rgba(59,158,255,.12);color:var(--accent);}
+.mod-pills{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;}
+.mod-pill{font-size:.72rem;font-weight:600;padding:4px 10px;border:1px solid var(--border2);border-radius:12px;background:var(--surface2);color:var(--text-muted);cursor:pointer;transition:all .15s;user-select:none;}
+.mod-pill.on{background:rgba(59,158,255,.12);border-color:var(--accent);color:var(--accent);}
+.mod-pill:hover{border-color:var(--accent);}
 </style>
 </head>
 <body>
@@ -295,9 +314,27 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica N
 <div class="container">
   <div class="app-header">
     <div class="app-logo">👥 Mi Equipo</div>
-    <div class="app-tagline">AquaChile · ¿Quién eres?</div>
+    <div class="app-tagline">AquaChile · Gestión del ciclo de vida laboral</div>
   </div>
-  <div id="login-list"></div>
+  <div class="login-form-wrap">
+    <div class="login-form-card" id="login-card">
+      <div class="section-lbl" style="margin-top:0;justify-content:center;margin-bottom:20px">Iniciar sesión</div>
+      <div class="field">
+        <label>Correo electrónico</label>
+        <input type="email" id="login-email" placeholder="correo@aquachile.com" oninput="clearLoginErr()" onkeydown="if(event.key==='Enter')attemptLogin()"/>
+      </div>
+      <div class="field">
+        <label>Contraseña</label>
+        <div class="pw-wrap">
+          <input type="password" id="login-pass" placeholder="••••••••" oninput="clearLoginErr()" onkeydown="if(event.key==='Enter')attemptLogin()"/>
+          <button class="pw-show" type="button" onclick="toggleLoginPass()">Mostrar</button>
+        </div>
+      </div>
+      <div class="login-err" id="login-err">Correo o contraseña incorrectos</div>
+      <button class="btn btn-primary btn-full" onclick="attemptLogin()">Ingresar →</button>
+      <div class="login-hint">¿Problemas para ingresar? Contacta al administrador del sistema.<br>En una próxima versión se integrará con Entra ID de Microsoft.</div>
+    </div>
+  </div>
 </div>
 </div>
 
@@ -492,6 +529,20 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica N
 </div>
 </div>
 
+<!-- PERMISOS SCREEN -->
+<div class="screen" id="screen-permisos">
+<div class="container">
+  <div class="app-header" style="padding:24px 0 16px">
+    <div class="app-logo" style="font-size:1.3rem">🔐 Permisos de Acceso</div>
+  </div>
+  <div class="page-hdr">
+    <h2>Usuarios del sistema</h2>
+    <button class="btn btn-sm btn-primary" onclick="openUserForm()">+ Nuevo usuario</button>
+  </div>
+  <div id="permisos-list"></div>
+</div>
+</div>
+
 <!-- MODALS -->
 
 <!-- TEAM FORM -->
@@ -649,6 +700,54 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica N
 </div>
 </div>
 
+<!-- USER FORM MODAL -->
+<div class="modal-overlay" id="modal-user">
+<div class="modal">
+  <div class="modal-hdr">
+    <h3 id="user-form-title">Nuevo Usuario</h3>
+    <button class="modal-close" onclick="closeModal('modal-user')">×</button>
+  </div>
+  <div class="modal-body">
+    <input type="hidden" id="uf-id"/>
+    <div class="grid-2">
+      <div class="field"><label>Nombre completo</label><input type="text" id="uf-name" placeholder="Nombre Apellido"/></div>
+      <div class="field"><label>Correo electrónico</label><input type="email" id="uf-email" placeholder="correo@aquachile.com"/></div>
+    </div>
+    <div class="field">
+      <label>Contraseña <span id="uf-pass-hint" style="font-weight:400;color:var(--text-muted)">(dejar vacío para no cambiar)</span></label>
+      <div class="pw-wrap">
+        <input type="password" id="uf-pass" placeholder="Nueva contraseña"/>
+        <button class="pw-show" type="button" onclick="toggleUfPass()">Mostrar</button>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="field"><label>Rol</label>
+        <select id="uf-role" onchange="updateUfTeamWrap()">
+          <option value="manager">Gerente / Admin</option>
+          <option value="leader">Líder de equipo</option>
+        </select>
+      </div>
+      <div class="field" id="uf-team-wrap">
+        <label>Equipo asignado</label>
+        <select id="uf-team"><option value="">— Seleccionar —</option></select>
+      </div>
+    </div>
+    <div class="section-lbl" style="margin-top:4px">Módulos habilitados</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px">
+      <label style="display:flex;align-items:center;gap:6px;font-size:.85rem;cursor:pointer;padding:6px 10px;border:1px solid var(--border2);border-radius:var(--r-sm);background:var(--surface2)"><input type="checkbox" id="uf-mod-home"/> 🏠 Inicio</label>
+      <label style="display:flex;align-items:center;gap:6px;font-size:.85rem;cursor:pointer;padding:6px 10px;border:1px solid var(--border2);border-radius:var(--r-sm);background:var(--surface2)"><input type="checkbox" id="uf-mod-equipos"/> 👥 Equipos</label>
+      <label style="display:flex;align-items:center;gap:6px;font-size:.85rem;cursor:pointer;padding:6px 10px;border:1px solid var(--border2);border-radius:var(--r-sm);background:var(--surface2)"><input type="checkbox" id="uf-mod-planner"/> 📋 Semana</label>
+      <label style="display:flex;align-items:center;gap:6px;font-size:.85rem;cursor:pointer;padding:6px 10px;border:1px solid var(--border2);border-radius:var(--r-sm);background:var(--surface2)"><input type="checkbox" id="uf-mod-calendar"/> 📅 Gerencia</label>
+      <label style="display:flex;align-items:center;gap:6px;font-size:.85rem;cursor:pointer;padding:6px 10px;border:1px solid var(--border2);border-radius:var(--r-sm);background:var(--surface2)"><input type="checkbox" id="uf-mod-permisos"/> 🔐 Permisos</label>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-primary btn-full" onclick="saveUser()">Guardar</button>
+      <button class="btn btn-ghost" onclick="closeModal('modal-user')">Cancelar</button>
+    </div>
+  </div>
+</div>
+</div>
+
 <!-- NAV BAR -->
 <nav class="nav-bar">
   <button class="nav-btn active" id="nav-home" onclick="showScreen('home');setNav('nav-home')">
@@ -666,6 +765,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica N
   <button class="nav-btn" id="nav-calendar" onclick="showScreen('calendar');setNav('nav-calendar')">
     <span class="nav-icon">📅</span><span>Gerencia</span>
   </button>
+  <button class="nav-btn" id="nav-permisos" onclick="showScreen('permisos');setNav('nav-permisos')" style="display:none">
+    <span class="nav-icon">🔐</span><span>Permisos</span>
+  </button>
 </nav>
 
 <script>
@@ -676,6 +778,7 @@ function load() {
   try {
     const data = JSON.parse(localStorage.getItem(STORE_KEY)) || defaultData();
     if (!data.attendance) data.attendance = [];
+    if (!data.users) data.users = defaultData().users;
     // Migrate old team names
     const rename = {'Infraestructura':'Operaciones TI','Desarrollo':'Sistemas y Procesos',
       'Datos & Analytics':'Nuevas Tecnologías','Seguridad':'Gestión y Servicios TI','Soporte':'Gobierno de Datos'};
@@ -696,7 +799,12 @@ function defaultData() {
       { id: 't5', name: 'Gobierno de Datos', color: '#f59e0b', leadId: '', desc: '' }
     ],
     employees: [],
-    attendance: []
+    attendance: [],
+    users: [
+      { id: 'u-admin', email: 'gerente@aquachile.com', password: 'AquaChile2026',
+        name: 'Gerente del Área', role: 'manager', teamId: null, empId: null,
+        modules: ['home','equipos','planner','calendar','permisos'] }
+    ]
   };
 }
 
@@ -712,13 +820,14 @@ let eqPillActive = 'all';
 function showScreen(name) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
   document.getElementById('screen-' + name).classList.add('active');
+  document.querySelector('.nav-bar').style.display = name === 'login' ? 'none' : '';
   if (name === 'home') renderHome();
   if (name === 'equipos') renderEquipos();
   if (name === 'team') renderTeam();
   if (name === 'employee') renderEmployee();
   if (name === 'planner') renderPlanner();
   if (name === 'calendar') renderCalendar();
-  if (name === 'login') renderLogin();
+  if (name === 'permisos') renderPermisos();
 }
 
 function setNav(id) {
@@ -1796,59 +1905,203 @@ function toast(msg) {
   setTimeout(() => t.classList.remove('show'), 2200);
 }
 
-// ── LOGIN ─────────────────────────────────────────────────────────────────────
+// ── LOGIN / SESSION ───────────────────────────────────────────────────────────
 const SESSION_KEY = 'eq_user_v1';
 
 function getCurrentUser() {
-  try { return JSON.parse(sessionStorage.getItem(SESSION_KEY)); } catch(e) { return null; }
+  try {
+    const u = JSON.parse(sessionStorage.getItem(SESSION_KEY));
+    // Reject old session format that lacks modules
+    return (u && u.modules) ? u : null;
+  } catch(e) { return null; }
 }
 
-function doLogin(user) {
-  sessionStorage.setItem(SESSION_KEY, JSON.stringify(user));
-  showScreen('home'); setNav('nav-home');
+function doLogin(sessionUser) {
+  sessionStorage.setItem(SESSION_KEY, JSON.stringify(sessionUser));
+  updateNavVisibility(sessionUser);
+  const first = sessionUser.modules && sessionUser.modules[0] ? sessionUser.modules[0] : 'home';
+  showScreen(first); setNav('nav-' + first);
 }
 
 function doLogout() {
   sessionStorage.removeItem(SESSION_KEY);
-  showScreen('login'); setNav('nav-home');
+  // Reset all nav buttons to default visible
+  ['nav-home','nav-equipos','nav-planner','nav-calendar'].forEach(id => {
+    const el = document.getElementById(id); if (el) el.style.display = '';
+  });
+  document.getElementById('nav-permisos').style.display = 'none';
+  document.getElementById('nav-emp').style.display = 'none';
+  showScreen('login');
 }
 
-function renderLogin() {
-  const leaders = db.teams
-    .filter(t => t.leadId)
-    .map(t => ({ team: t, emp: db.employees.find(e => e.id === t.leadId) }))
-    .filter(x => x.emp);
+function updateNavVisibility(user) {
+  const mods = user?.modules || [];
+  const map = { home:'nav-home', equipos:'nav-equipos', planner:'nav-planner', calendar:'nav-calendar', permisos:'nav-permisos' };
+  Object.entries(map).forEach(([mod, id]) => {
+    const el = document.getElementById(id);
+    if (el) el.style.display = mods.includes(mod) ? '' : 'none';
+  });
+  document.getElementById('nav-emp').style.display = 'none';
+}
 
-  const managerCard = `
-    <div class="login-card manager" onclick="doLogin({type:'manager',name:'Gerente del Área',empId:null,teamId:null})">
-      <div class="login-avatar gold">⭐</div>
-      <div class="login-name">Gerente del Área</div>
-      <div class="login-role">Acceso completo · Solo lectura en planificador</div>
-    </div>`;
+function attemptLogin() {
+  const email = (document.getElementById('login-email')?.value || '').trim().toLowerCase();
+  const pass = document.getElementById('login-pass')?.value || '';
+  const errEl = document.getElementById('login-err');
+  const card = document.getElementById('login-card');
 
-  const leaderCards = leaders.map(({ team, emp }) => {
-    const initials = ((emp.nombre||'?')[0]+(emp.apellido||'')[0]).toUpperCase();
-    return `<div class="login-card" onclick="doLogin({type:'leader',name:'${emp.nombre} ${emp.apellido}',empId:'${emp.id}',teamId:'${team.id}'})"
-        style="border-top:3px solid ${team.color}">
-      <div class="login-avatar">${initials}</div>
-      <div class="login-name">${emp.nombre} ${emp.apellido}</div>
-      <div class="login-role" style="color:${team.color}">${team.name}</div>
-      <div class="login-role" style="margin-top:4px">${emp.cargo||'Líder de equipo'}</div>
+  if (!email || !pass) {
+    errEl.textContent = 'Ingresa tu correo y contraseña.';
+    errEl.style.display = 'block'; return;
+  }
+
+  const user = db.users.find(u => u.email.toLowerCase() === email && u.password === pass);
+  if (!user) {
+    errEl.textContent = 'Correo o contraseña incorrectos.';
+    errEl.style.display = 'block';
+    if (card) { card.style.animation = 'none'; requestAnimationFrame(() => { card.style.animation = 'shake .35s ease'; }); }
+    return;
+  }
+
+  doLogin({ type: user.role, name: user.name, empId: user.empId||null, teamId: user.teamId||null, modules: user.modules });
+}
+
+function clearLoginErr() {
+  const el = document.getElementById('login-err');
+  if (el) el.style.display = 'none';
+}
+
+function toggleLoginPass() {
+  const inp = document.getElementById('login-pass');
+  if (!inp) return;
+  inp.type = inp.type === 'password' ? 'text' : 'password';
+}
+
+// ── PERMISOS ──────────────────────────────────────────────────────────────────
+const ALL_MODULES = [
+  { id:'home', icon:'🏠', label:'Inicio' },
+  { id:'equipos', icon:'👥', label:'Equipos' },
+  { id:'planner', icon:'📋', label:'Semana' },
+  { id:'calendar', icon:'📅', label:'Gerencia' },
+  { id:'permisos', icon:'🔐', label:'Permisos' },
+];
+
+function renderPermisos() {
+  const list = document.getElementById('permisos-list');
+  if (!db.users.length) {
+    list.innerHTML = '<div class="empty"><div class="empty-icon">👤</div><p>Sin usuarios configurados</p></div>';
+    return;
+  }
+  list.innerHTML = db.users.map(u => {
+    const initials = u.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    const team = u.teamId ? db.teams.find(t => t.id === u.teamId) : null;
+    const mods = u.modules || [];
+    return `<div class="user-row">
+      <div class="avatar" style="width:44px;height:44px;font-size:.9rem;flex-shrink:0${u.role==='manager'?';background:linear-gradient(135deg,#b45309,#fbbf24)':''}">${initials}</div>
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:2px">
+          <span style="font-weight:700;color:var(--text-bright);font-size:.95rem">${u.name}</span>
+          <span class="urb ${u.role==='manager'?'urb-manager':'urb-leader'}">${u.role==='manager'?'Gerente':'Líder'}</span>
+          ${team ? `<span style="font-size:.72rem;font-weight:600;color:${team.color}">${team.name}</span>` : ''}
+        </div>
+        <div style="font-size:.78rem;color:var(--text-muted);margin-bottom:10px">${u.email}</div>
+        <div class="mod-pills">
+          ${ALL_MODULES.map(m => `<span class="mod-pill${mods.includes(m.id)?' on':''}" onclick="toggleUserMod('${u.id}','${m.id}')">${m.icon} ${m.label}</span>`).join('')}
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0">
+        <button class="btn btn-sm btn-ghost" onclick="openUserForm('${u.id}')">✏ Editar</button>
+        ${u.id === 'u-admin' ? '' : `<button class="btn btn-sm btn-danger" onclick="deleteUser('${u.id}')">🗑</button>`}
+      </div>
     </div>`;
   }).join('');
+}
 
-  const noLeadersHint = !leaders.length
-    ? `<div class="alert alert-info" style="margin-top:16px">Para que los líderes puedan ingresar, primero agrega personas a cada equipo y asigna un líder.</div>` : '';
+function toggleUserMod(userId, mod) {
+  const u = db.users.find(x => x.id === userId);
+  if (!u) return;
+  const idx = u.modules.indexOf(mod);
+  if (idx >= 0) u.modules.splice(idx, 1);
+  else u.modules.push(mod);
+  save(db); renderPermisos(); toast('Permisos actualizados');
+}
 
-  document.getElementById('login-list').innerHTML =
-    `<div class="login-grid">${managerCard}${leaderCards}</div>${noLeadersHint}`;
+function openUserForm(userId) {
+  const u = userId ? db.users.find(x => x.id === userId) : null;
+  document.getElementById('user-form-title').textContent = u ? 'Editar Usuario' : 'Nuevo Usuario';
+  document.getElementById('uf-id').value = u?.id || '';
+  document.getElementById('uf-name').value = u?.name || '';
+  document.getElementById('uf-email').value = u?.email || '';
+  document.getElementById('uf-pass').value = '';
+  document.getElementById('uf-pass-hint').style.display = u ? '' : 'none';
+  document.getElementById('uf-role').value = u?.role || 'leader';
+  updateUfTeamWrap(u?.teamId);
+  const mods = u?.modules || ['home','equipos','planner'];
+  ALL_MODULES.forEach(m => {
+    const cb = document.getElementById('uf-mod-'+m.id);
+    if (cb) cb.checked = mods.includes(m.id);
+  });
+  openModal('modal-user');
+}
+
+function updateUfTeamWrap(selectedTid) {
+  const role = document.getElementById('uf-role').value;
+  const wrap = document.getElementById('uf-team-wrap');
+  wrap.style.display = role === 'leader' ? '' : 'none';
+  const sel = document.getElementById('uf-team');
+  sel.innerHTML = '<option value="">— Seleccionar —</option>' +
+    db.teams.map(t => `<option value="${t.id}"${t.id===selectedTid?' selected':''}>${t.name}</option>`).join('');
+}
+
+function saveUser() {
+  const id = document.getElementById('uf-id').value;
+  const name = document.getElementById('uf-name').value.trim();
+  const email = document.getElementById('uf-email').value.trim().toLowerCase();
+  const pass = document.getElementById('uf-pass').value;
+  const role = document.getElementById('uf-role').value;
+  const teamId = role === 'leader' ? (document.getElementById('uf-team').value || null) : null;
+
+  if (!name || !email) { toast('Nombre y correo son obligatorios'); return; }
+  if (!id && !pass) { toast('La contraseña es obligatoria para un nuevo usuario'); return; }
+
+  const dup = db.users.find(u => u.email.toLowerCase() === email && u.id !== id);
+  if (dup) { toast('Ese correo ya está registrado'); return; }
+
+  const mods = ALL_MODULES.map(m => m.id).filter(m => document.getElementById('uf-mod-'+m)?.checked);
+
+  if (id) {
+    const u = db.users.find(x => x.id === id);
+    u.name = name; u.email = email; u.role = role; u.teamId = teamId; u.modules = mods;
+    if (pass) u.password = pass;
+  } else {
+    db.users.push({ id: uid(), name, email, password: pass, role, teamId, empId: null, modules: mods });
+  }
+
+  save(db); closeModal('modal-user'); renderPermisos(); toast('Usuario guardado');
+}
+
+function deleteUser(userId) {
+  if (!confirm('¿Eliminar este usuario? No podrá acceder a la aplicación.')) return;
+  db.users = db.users.filter(u => u.id !== userId);
+  save(db); renderPermisos(); toast('Usuario eliminado');
+}
+
+function toggleUfPass() {
+  const inp = document.getElementById('uf-pass');
+  if (!inp) return;
+  inp.type = inp.type === 'password' ? 'text' : 'password';
 }
 
 // ── BOOT ──────────────────────────────────────────────────────────────────────
 (function boot() {
   const user = getCurrentUser();
-  if (user) { showScreen('home'); setNav('nav-home'); }
-  else { renderLogin(); }
+  if (user) {
+    updateNavVisibility(user);
+    const first = user.modules && user.modules[0] ? user.modules[0] : 'home';
+    showScreen(first); setNav('nav-' + first);
+  } else {
+    document.querySelector('.nav-bar').style.display = 'none';
+  }
 })();
 </script>
 </body>
