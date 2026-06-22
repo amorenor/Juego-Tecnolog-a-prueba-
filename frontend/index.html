@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Gestión de Equipo · AquaChile</title>
+<link rel="stylesheet" href="/styles/main.css"/>
+</head>
+<body>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- LOADING OVERLAY -->
+<div class="loading-overlay" id="loading-overlay">
+  <div class="spinner"></div>
+  <div style="font-size:.85rem;color:var(--text-muted)">Cargando…</div>
+</div>
+
+<!-- LOGIN SCREEN -->
+<div class="screen active" id="screen-login">
+<div class="container">
+  <div class="app-header">
+    <div class="app-logo">👥 Mi Equipo</div>
+    <div class="app-tagline">AquaChile · Gestión del ciclo de vida laboral</div>
+  </div>
+  <div class="login-form-wrap">
+    <div class="login-form-card" id="login-card">
+      <div class="section-lbl" style="margin-top:0;justify-content:center;margin-bottom:20px">Iniciar sesión</div>
+      <div class="field">
+        <label>Correo electrónico</label>
+        <input type="email" id="login-email" placeholder="correo@aquachile.com" oninput="clearLoginErr()" onkeydown="if(event.key==='Enter')attemptLogin()"/>
+      </div>
+      <div class="field">
+        <label>Contraseña</label>
+        <div class="pw-wrap">
+          <input type="password" id="login-pass" placeholder="••••••••" oninput="clearLoginErr()" onkeydown="if(event.key==='Enter')attemptLogin()"/>
+          <button class="pw-show" type="button" onclick="toggleLoginPass()">Mostrar</button>
+        </div>
+      </div>
+      <div class="login-err" id="login-err"></div>
+      <button class="btn btn-primary btn-full" onclick="attemptLogin()">Ingresar →</button>
+      <div class="login-hint">¿Problemas para ingresar? Contacta al administrador.<br>Próximamente: integración con Microsoft Entra ID.</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- EQUIPOS SCREEN -->
+<div class="screen" id="screen-equipos">
+<div class="container">
+  <div class="app-header" style="padding:24px 0 16px">
+    <div class="app-logo" style="font-size:1.3rem">👥 Equipos</div>
+  </div>
+  <div class="eq-search">
+    <input type="text" id="eq-search-input" placeholder="Buscar por nombre, cargo…" oninput="filterEquipos()"/>
+    <button class="btn btn-sm btn-primary" onclick="openTeamForm()">+ Equipo</button>
+  </div>
+  <div class="eq-team-pills" id="eq-pills"></div>
+  <div id="eq-panels"></div>
+</div>
+</div>
+
+<!-- HOME SCREEN -->
+<div class="screen" id="screen-home">
+<div class="container">
+  <div class="app-header">
+    <div class="app-logo">👥 Mi Equipo</div>
+    <div class="app-tagline">Gestión del ciclo de vida laboral · AquaChile</div>
+  </div>
+  <div class="stats-row" id="home-stats"></div>
+  <div class="news-section">
+    <div class="section-lbl">Novedades del día</div>
+    <div class="news-date" id="news-date"></div>
+    <div id="news-container"></div>
+  </div>
+  <div class="page-hdr">
+    <h2>Equipos</h2>
+    <button class="btn btn-sm btn-ghost" onclick="openTeamForm()">+ Equipo</button>
+  </div>
+  <div class="teams-grid" id="teams-grid"></div>
+</div>
+</div>
+
+<!-- TEAM SCREEN -->
+<div class="screen" id="screen-team">
+<div class="container">
+  <button class="back-btn" onclick="showScreen('home')">← Volver</button>
+  <div class="page-hdr">
+    <h2 id="team-screen-name">Equipo</h2>
+    <div style="display:flex;gap:8px;">
+      <button class="btn btn-sm btn-ghost" onclick="editCurrentTeam()">Editar</button>
+      <button class="btn btn-sm btn-primary" onclick="openEmployeeForm()">+ Persona</button>
+    </div>
+  </div>
+  <div class="search-bar">
+    <input type="text" id="member-search" placeholder="Buscar por nombre o cargo…" oninput="filterMembers()"/>
+  </div>
+  <div class="members-grid" id="members-grid"></div>
+</div>
+</div>
+
+<!-- EMPLOYEE SCREEN -->
+<div class="screen" id="screen-employee">
+<div class="container">
+  <button class="back-btn" id="emp-back-btn" onclick="backToTeam()">← Volver al equipo</button>
+  <div class="profile-hero" id="profile-hero"></div>
+  <div class="tabs" id="profile-tabs">
+    <button class="tab active" onclick="showTab('personal',this)">Personal</button>
+    <button class="tab" onclick="showTab('laboral',this)">Laboral</button>
+    <button class="tab" onclick="showTab('objetivos',this)">Objetivos</button>
+    <button class="tab" onclick="showTab('conversaciones',this)">Conversaciones</button>
+    <button class="tab" onclick="showTab('capacitaciones',this)">Capacitaciones</button>
+    <button class="tab" onclick="showTab('reconocimientos',this)">Reconoc.</button>
+  </div>
+  <!-- Personal -->
+  <div class="tab-panel active" id="tab-personal">
+    <div class="card">
+      <div class="page-hdr" style="margin-bottom:12px;">
+        <span class="section-lbl" style="margin:0">Datos Personales</span>
+        <button class="btn btn-sm btn-ghost" onclick="openEmployeeForm(true)">Editar</button>
+      </div>
+      <div class="info-grid" id="info-personal"></div>
+      <div class="section-lbl">Familia</div>
+      <div class="info-grid" id="info-familia"></div>
+      <div class="section-lbl">Formación</div>
+      <div class="info-grid" id="info-formacion"></div>
+    </div>
+  </div>
+  <!-- Laboral -->
+  <div class="tab-panel" id="tab-laboral">
+    <div class="card">
+      <div class="page-hdr" style="margin-bottom:12px;">
+        <span class="section-lbl" style="margin:0">Datos Laborales</span>
+        <button class="btn btn-sm btn-ghost" onclick="openEmployeeForm(true)">Editar</button>
+      </div>
+      <div class="info-grid" id="info-laboral"></div>
+    </div>
+  </div>
+  <!-- Objetivos -->
+  <div class="tab-panel" id="tab-objetivos">
+    <div class="page-hdr">
+      <h2>Objetivos y Metas</h2>
+      <button class="btn btn-sm btn-primary" onclick="openCommitForm('objetivo')">+ Objetivo</button>
+    </div>
+    <div class="commit-list" id="list-objetivos"></div>
+  </div>
+  <!-- Conversaciones -->
+  <div class="tab-panel" id="tab-conversaciones">
+    <div class="page-hdr">
+      <h2>Conversaciones 1:1</h2>
+      <button class="btn btn-sm btn-primary" onclick="openCommitForm('conversacion')">+ Conversación</button>
+    </div>
+    <div class="commit-list" id="list-conversaciones"></div>
+  </div>
+  <!-- Capacitaciones -->
+  <div class="tab-panel" id="tab-capacitaciones">
+    <div class="page-hdr">
+      <h2>Capacitaciones</h2>
+      <button class="btn btn-sm btn-primary" onclick="openCommitForm('capacitacion')">+ Capacitación</button>
+    </div>
+    <div class="commit-list" id="list-capacitaciones"></div>
+  </div>
+  <!-- Reconocimientos -->
+  <div class="tab-panel" id="tab-reconocimientos">
+    <div class="page-hdr">
+      <h2>Reconocimientos</h2>
+      <button class="btn btn-sm btn-primary" onclick="openCommitForm('reconocimiento')">+ Registro</button>
+    </div>
+    <div class="commit-list" id="list-reconocimientos"></div>
+  </div>
+</div>
+</div>
+
+<!-- PLANNER SCREEN -->
+<div class="screen" id="screen-planner">
+<div class="container">
+  <div class="app-header" style="padding:24px 0 12px">
+    <div class="app-logo" style="font-size:1.3rem">📋 Planificación Semanal</div>
+  </div>
+  <div id="planner-user-badge"></div>
+  <div class="week-nav">
+    <button class="week-nav-btn" onclick="changeWeek(-1)">←</button>
+    <h3 id="week-label"></h3>
+    <button class="week-nav-btn" onclick="changeWeek(1)">→</button>
+  </div>
+  <div id="holiday-alert"></div>
+  <div class="planner-restriction">⚠️ Restricciones teletrabajo: <b>Lun–Jue</b> máx. 2 personas/equipo · <b>Viernes</b> máx. 1 persona/equipo</div>
+  <div class="team-tabs" id="planner-tabs"></div>
+  <div class="planner-wrap">
+    <table class="planner-table" id="planner-table"></table>
+  </div>
+  <div class="planner-legend">
+    <span><span class="day-btn on-T" style="display:inline-flex;align-items:center;justify-content:center;pointer-events:none">T</span> <span class="l-T">Teletrabajo</span></span>
+    <span><span class="day-btn on-V" style="display:inline-flex;align-items:center;justify-content:center;pointer-events:none">V</span> <span class="l-V">Vacaciones</span></span>
+    <span><span class="day-btn on-C" style="display:inline-flex;align-items:center;justify-content:center;pointer-events:none">C</span> <span class="l-C">Compensado</span></span>
+  </div>
+</div>
+</div>
+
+<!-- CALENDAR SCREEN -->
+<div class="screen" id="screen-calendar">
+<div class="container">
+  <div class="app-header" style="padding:24px 0 12px">
+    <div class="app-logo" style="font-size:1.3rem">📅 Vista de Gerencia</div>
+  </div>
+  <div class="week-nav">
+    <button class="week-nav-btn" onclick="changeMonth(-1)">←</button>
+    <h3 id="cal-month-label"></h3>
+    <button class="week-nav-btn" onclick="changeMonth(1)">→</button>
+  </div>
+  <div style="display:flex;gap:8px;margin-bottom:14px;">
+    <button id="cal-btn-full" class="btn btn-sm btn-primary" onclick="setCalView('full')">Semana completa (L–D)</button>
+    <button id="cal-btn-work" class="btn btn-sm btn-ghost" onclick="setCalView('work')">Semana laboral (L–V)</button>
+  </div>
+  <div id="cal-wrap">
+    <div class="cal-header-row" id="cal-header"></div>
+    <div class="cal-grid" id="cal-grid"></div>
+  </div>
+  <div class="cal-legend">
+    <span>💻 Teletrabajo</span><span>🌴 Vacaciones</span><span>📅 Compensado</span>
+    <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:rgba(239,68,68,0.25);display:inline-block"></span>Festivo</span>
+  </div>
+</div>
+</div>
+
+<!-- PERMISOS SCREEN -->
+<div class="screen" id="screen-permisos">
+<div class="container">
+  <div class="app-header" style="padding:24px 0 16px">
+    <div class="app-logo" style="font-size:1.3rem">🔐 Permisos de Acceso</div>
+  </div>
+  <div class="page-hdr">
+    <h2>Usuarios del sistema</h2>
+    <button class="btn btn-sm btn-primary" onclick="openUserForm()">+ Nuevo usuario</button>
+  </div>
+  <div id="permisos-list"></div>
+</div>
+</div>
+
+<!-- MODALS -->
+
+<!-- TEAM FORM -->
+<div class="modal-overlay" id="modal-team">
+<div class="modal">
+  <div class="modal-hdr">
+    <h3 id="team-form-title">Nuevo Equipo</h3>
+    <button class="modal-close" onclick="closeModal('modal-team')">×</button>
+  </div>
+  <div class="modal-body">
+    <input type="hidden" id="team-id"/>
+    <div class="field"><label>Nombre del Equipo</label><input type="text" id="team-name" placeholder="Ej: Infraestructura…"/></div>
+    <div class="field"><label>Color</label>
+      <select id="team-color">
+        <option value="#3b9eff">Azul</option>
+        <option value="#22c55e">Verde</option>
+        <option value="#f59e0b">Naranja</option>
+        <option value="#a855f7">Morado</option>
+        <option value="#ef4444">Rojo</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Líder / Jefe de equipo</label>
+      <select id="team-lead"><option value="">— Sin líder —</option></select>
+      <div id="team-lead-hint" style="font-size:.75rem;color:var(--text-muted);margin-top:5px;display:none">Agrega miembros al equipo primero.</div>
+    </div>
+    <div class="field"><label>Descripción (opcional)</label><textarea id="team-desc" rows="2"></textarea></div>
+    <div style="display:flex;gap:8px;margin-top:16px;">
+      <button class="btn btn-primary btn-full" onclick="saveTeam()">Guardar</button>
+      <button class="btn btn-ghost" onclick="closeModal('modal-team')">Cancelar</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- EMPLOYEE FORM -->
+<div class="modal-overlay" id="modal-employee">
+<div class="modal">
+  <div class="modal-hdr">
+    <h3 id="emp-form-title">Nueva Persona</h3>
+    <button class="modal-close" onclick="closeModal('modal-employee')">×</button>
+  </div>
+  <div class="modal-body">
+    <input type="hidden" id="emp-id"/>
+    <div class="section-lbl" style="margin-top:0">Datos Personales</div>
+    <div class="grid-2">
+      <div class="field"><label>Nombre</label><input type="text" id="emp-nombre"/></div>
+      <div class="field"><label>Apellido</label><input type="text" id="emp-apellido"/></div>
+    </div>
+    <div class="grid-2">
+      <div class="field"><label>RUT</label><input type="text" id="emp-rut" placeholder="12.345.678-9"/></div>
+      <div class="field"><label>Fecha de nacimiento</label><input type="date" id="emp-nacimiento"/></div>
+    </div>
+    <div class="grid-2">
+      <div class="field"><label>Email</label><input type="email" id="emp-email"/></div>
+      <div class="field"><label>Teléfono</label><input type="tel" id="emp-tel"/></div>
+    </div>
+    <div class="section-lbl">Familia</div>
+    <div class="grid-2">
+      <div class="field"><label>Estado Civil</label>
+        <select id="emp-estadocivil">
+          <option value="">— Seleccionar —</option>
+          <option>Soltero/a</option><option>Casado/a</option>
+          <option>Conviviente</option><option>Divorciado/a</option><option>Viudo/a</option>
+        </select>
+      </div>
+      <div class="field"><label>N° de hijos</label><input type="number" id="emp-hijos" min="0"/></div>
+    </div>
+    <div class="grid-2">
+      <div class="field"><label>Contacto emergencia</label><input type="text" id="emp-emerg-nombre"/></div>
+      <div class="field"><label>Tel. emergencia</label><input type="tel" id="emp-emerg-tel"/></div>
+    </div>
+    <div class="section-lbl">Formación</div>
+    <div class="field"><label>Nivel educacional</label>
+      <select id="emp-educacion">
+        <option value="">— Seleccionar —</option>
+        <option>Básica</option><option>Media</option><option>Técnico Superior</option>
+        <option>Universitaria</option><option>Postgrado / Magíster</option><option>Doctorado</option>
+      </select>
+    </div>
+    <div class="field"><label>Título / Profesión</label><input type="text" id="emp-titulo"/></div>
+    <div class="field"><label>Certificaciones (separadas por coma)</label><input type="text" id="emp-cert" placeholder="AWS, PMP…"/></div>
+    <div class="field"><label>Idiomas</label><input type="text" id="emp-idiomas" placeholder="Español, Inglés B2…"/></div>
+    <div class="section-lbl">Datos Laborales</div>
+    <div class="field"><label>Cargo</label><input type="text" id="emp-cargo"/></div>
+    <div class="grid-2">
+      <div class="field"><label>Fecha de ingreso</label><input type="date" id="emp-ingreso"/></div>
+      <div class="field"><label>Tipo de contrato</label>
+        <select id="emp-contrato">
+          <option value="">— Seleccionar —</option>
+          <option>Indefinido</option><option>Plazo Fijo</option>
+          <option>Por Obra</option><option>Honorarios</option><option>Práctica</option>
+        </select>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="field"><label>Centro de costo</label><input type="text" id="emp-ceco"/></div>
+      <div class="field"><label>Jornada</label>
+        <select id="emp-jornada">
+          <option value="">— Seleccionar —</option>
+          <option>Completa</option><option>Parcial</option><option>Turno</option>
+        </select>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:16px;">
+      <button class="btn btn-primary btn-full" onclick="saveEmployee()">Guardar</button>
+      <button class="btn btn-ghost" onclick="closeModal('modal-employee')">Cancelar</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- COMMITMENT FORM -->
+<div class="modal-overlay" id="modal-commit">
+<div class="modal">
+  <div class="modal-hdr">
+    <h3 id="commit-form-title">Nuevo Compromiso</h3>
+    <button class="modal-close" onclick="closeModal('modal-commit')">×</button>
+  </div>
+  <div class="modal-body" id="commit-form-body"></div>
+</div>
+</div>
+
+<!-- COMPENSADO MODAL -->
+<div class="modal-overlay" id="modal-compensado">
+<div class="modal" style="max-width:420px">
+  <div class="modal-hdr">
+    <h3 id="comp-modal-title">Día Compensado</h3>
+    <button class="modal-close" onclick="cancelCompensado()">×</button>
+  </div>
+  <div class="modal-body">
+    <div class="field"><label>Motivo del día compensado</label>
+      <textarea id="comp-motivo" rows="3" placeholder="Ej: Compensación por trabajo en feriado…"></textarea>
+    </div>
+    <div style="display:flex;gap:8px;margin-top:12px">
+      <button class="btn btn-primary btn-full" onclick="saveCompensado()">Guardar</button>
+      <button class="btn btn-ghost" onclick="cancelCompensado()">Cancelar</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- DAY DETAIL MODAL -->
+<div class="modal-overlay" id="modal-day">
+<div class="modal">
+  <div class="modal-hdr">
+    <h3 id="day-modal-title">Detalle del día</h3>
+    <button class="modal-close" onclick="closeModal('modal-day')">×</button>
+  </div>
+  <div class="modal-body" id="day-modal-body"></div>
+</div>
+</div>
+
+<!-- USER FORM MODAL -->
+<div class="modal-overlay" id="modal-user">
+<div class="modal">
+  <div class="modal-hdr">
+    <h3 id="user-form-title">Nuevo Usuario</h3>
+    <button class="modal-close" onclick="closeModal('modal-user')">×</button>
+  </div>
+  <div class="modal-body">
+    <input type="hidden" id="uf-id"/>
+    <div class="grid-2">
+      <div class="field"><label>Nombre completo</label><input type="text" id="uf-name"/></div>
+      <div class="field"><label>Correo electrónico</label><input type="email" id="uf-email"/></div>
+    </div>
+    <div class="field">
+      <label>Contraseña <span id="uf-pass-hint" style="font-weight:400;color:var(--text-muted)">(vacío = sin cambio)</span></label>
+      <div class="pw-wrap">
+        <input type="password" id="uf-pass" placeholder="Nueva contraseña"/>
+        <button class="pw-show" type="button" onclick="toggleUfPass()">Mostrar</button>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="field"><label>Rol</label>
+        <select id="uf-role" onchange="updateUfTeamWrap()">
+          <option value="manager">Gerente / Admin</option>
+          <option value="leader">Líder de equipo</option>
+        </select>
+      </div>
+      <div class="field" id="uf-team-wrap">
+        <label>Equipo asignado</label>
+        <select id="uf-team"><option value="">— Seleccionar —</option></select>
+      </div>
+    </div>
+    <div class="section-lbl" style="margin-top:4px">Módulos habilitados</div>
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px">
+      <label style="display:flex;align-items:center;gap:6px;font-size:.85rem;cursor:pointer;padding:6px 10px;border:1px solid var(--border2);border-radius:var(--r-sm);background:var(--surface2)"><input type="checkbox" id="uf-mod-home"/> 🏠 Inicio</label>
+      <label style="display:flex;align-items:center;gap:6px;font-size:.85rem;cursor:pointer;padding:6px 10px;border:1px solid var(--border2);border-radius:var(--r-sm);background:var(--surface2)"><input type="checkbox" id="uf-mod-equipos"/> 👥 Equipos</label>
+      <label style="display:flex;align-items:center;gap:6px;font-size:.85rem;cursor:pointer;padding:6px 10px;border:1px solid var(--border2);border-radius:var(--r-sm);background:var(--surface2)"><input type="checkbox" id="uf-mod-planner"/> 📋 Semana</label>
+      <label style="display:flex;align-items:center;gap:6px;font-size:.85rem;cursor:pointer;padding:6px 10px;border:1px solid var(--border2);border-radius:var(--r-sm);background:var(--surface2)"><input type="checkbox" id="uf-mod-calendar"/> 📅 Gerencia</label>
+      <label style="display:flex;align-items:center;gap:6px;font-size:.85rem;cursor:pointer;padding:6px 10px;border:1px solid var(--border2);border-radius:var(--r-sm);background:var(--surface2)"><input type="checkbox" id="uf-mod-permisos"/> 🔐 Permisos</label>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-primary btn-full" onclick="saveUser()">Guardar</button>
+      <button class="btn btn-ghost" onclick="closeModal('modal-user')">Cancelar</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- NAV BAR -->
+<nav class="nav-bar">
+  <button class="nav-btn active" id="nav-home" onclick="showScreen('home');setNav('nav-home')">
+    <span class="nav-icon">🏠</span><span>Inicio</span>
+  </button>
+  <button class="nav-btn" id="nav-equipos" onclick="showScreen('equipos');setNav('nav-equipos')">
+    <span class="nav-icon">👥</span><span>Equipos</span>
+  </button>
+  <button class="nav-btn" id="nav-emp" onclick="showScreen('employee');setNav('nav-emp')" style="display:none">
+    <span class="nav-icon">👤</span><span>Persona</span>
+  </button>
+  <button class="nav-btn" id="nav-planner" onclick="showScreen('planner');setNav('nav-planner')">
+    <span class="nav-icon">📋</span><span>Semana</span>
+  </button>
+  <button class="nav-btn" id="nav-calendar" onclick="showScreen('calendar');setNav('nav-calendar')">
+    <span class="nav-icon">📅</span><span>Gerencia</span>
+  </button>
+  <button class="nav-btn" id="nav-permisos" onclick="showScreen('permisos');setNav('nav-permisos')" style="display:none">
+    <span class="nav-icon">🔐</span><span>Permisos</span>
+  </button>
+</nav>
+
+<script type="module" src="/src/main.js"></script>
+</body>
+</html>
