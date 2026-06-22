@@ -4,310 +4,19 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 <title>Gestión de Equipo · AquaChile</title>
-<style>
-:root {
-  --bg:#080f1a; --surface:#0f1e30; --surface2:#162840; --surface3:#1e3350;
-  --primary:#0d5fa5; --accent:#3b9eff; --accent2:#7ecbff;
-  --success:#22c55e; --warning:#f59e0b; --danger:#ef4444;
-  --text:#c8d8ec; --text-bright:#eef4fd; --text-muted:#6b8099;
-  --border:rgba(59,158,255,0.12); --border2:rgba(255,255,255,0.07);
-  --glow:rgba(59,158,255,0.25); --shadow:0 4px 24px rgba(0,0,0,0.5);
-  --r:14px; --r-sm:8px;
-}
-*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
-html{scroll-behavior:smooth;}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;line-height:1.6;}
-
-/* SCREENS */
-.screen{display:none;min-height:100vh;padding:16px 16px 80px;}
-.screen.active{display:block;}
-.container{max-width:900px;margin:0 auto;}
-
-/* APP HEADER */
-.app-header{text-align:center;padding:36px 0 28px;}
-.app-logo{font-size:clamp(1.4rem,4vw,2.2rem);font-weight:900;letter-spacing:-0.5px;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:6px;}
-.app-tagline{color:var(--text-muted);font-size:0.88rem;}
-
-/* NAV */
-.nav-bar{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-top:1px solid var(--border);display:flex;z-index:100;}
-.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 4px;border:none;background:none;color:var(--text-muted);font-size:0.68rem;cursor:pointer;transition:color .18s;}
-.nav-btn.active,.nav-btn:hover{color:var(--accent);}
-.nav-icon{font-size:1.3rem;}
-
-/* CARDS */
-.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px;box-shadow:var(--shadow);}
-.card+.card{margin-top:14px;}
-
-/* BUTTONS */
-.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:10px 20px;border:none;border-radius:var(--r-sm);font-size:0.9rem;font-weight:600;cursor:pointer;transition:all .18s;text-decoration:none;white-space:nowrap;}
-.btn:disabled{opacity:.4;pointer-events:none;}
-.btn-primary{background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff;}
-.btn-primary:hover{transform:translateY(-2px);box-shadow:0 6px 20px var(--glow);}
-.btn-success{background:linear-gradient(135deg,#15803d,var(--success));color:#fff;}
-.btn-danger{background:linear-gradient(135deg,#b91c1c,var(--danger));color:#fff;}
-.btn-ghost{background:var(--surface2);color:var(--text);border:1px solid var(--border2);}
-.btn-ghost:hover{border-color:var(--accent);color:var(--accent);}
-.btn-sm{padding:6px 12px;font-size:0.8rem;}
-.btn-full{width:100%;}
-
-/* BACK BUTTON */
-.back-btn{display:flex;align-items:center;gap:8px;background:none;border:none;color:var(--text-muted);font-size:0.9rem;cursor:pointer;padding:8px 0;margin-bottom:16px;}
-.back-btn:hover{color:var(--accent);}
-
-/* PAGE HEADER */
-.page-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;}
-.page-hdr h2{font-size:1.2rem;color:var(--text-bright);font-weight:700;}
-
-/* TEAMS GRID */
-.teams-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px;margin-top:8px;}
-.team-tile{background:var(--surface);border:1.5px solid var(--border2);border-radius:var(--r);padding:24px 20px;cursor:pointer;transition:all .22s;position:relative;overflow:hidden;}
-.team-tile::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--team-color,var(--accent));}
-.team-tile:hover{border-color:var(--team-color,var(--accent));transform:translateY(-3px);box-shadow:0 10px 32px rgba(0,0,0,0.4);}
-.team-name{font-size:1.05rem;font-weight:700;color:var(--text-bright);margin-bottom:6px;}
-.team-stats{display:flex;gap:16px;margin-top:14px;}
-.team-stat{text-align:center;}
-.team-stat-val{font-size:1.4rem;font-weight:800;color:var(--team-color,var(--accent));}
-.team-stat-lbl{font-size:0.72rem;color:var(--text-muted);}
-
-/* MEMBERS LIST */
-.members-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px;}
-.member-card{background:var(--surface);border:1px solid var(--border2);border-radius:var(--r);padding:18px 16px;cursor:pointer;transition:all .2s;display:flex;align-items:center;gap:14px;}
-.member-card:hover{border-color:var(--accent);transform:translateY(-2px);box-shadow:0 6px 20px var(--glow);}
-.avatar{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff;font-size:1.1rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.member-info{min-width:0;}
-.member-name{font-weight:700;color:var(--text-bright);font-size:0.95rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.member-role{font-size:0.78rem;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.member-badges{display:flex;gap:4px;margin-top:6px;flex-wrap:wrap;}
-.badge{font-size:0.68rem;padding:2px 7px;border-radius:20px;font-weight:600;}
-.badge-pending{background:rgba(245,158,11,0.15);color:var(--warning);}
-.badge-ok{background:rgba(34,197,94,0.12);color:var(--success);}
-.badge-info{background:rgba(59,158,255,0.12);color:var(--accent);}
-.badge-leader{background:rgba(251,191,36,0.15);color:#fbbf24;}
-.member-leader{border-color:rgba(251,191,36,0.4);}
-.member-leader .avatar{background:linear-gradient(135deg,#b45309,#fbbf24);}
-
-/* EMPLOYEE PROFILE TABS */
-.profile-hero{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:24px;display:flex;align-items:center;gap:20px;margin-bottom:20px;}
-.profile-avatar{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff;font-size:1.8rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.profile-name{font-size:1.3rem;font-weight:800;color:var(--text-bright);}
-.profile-role{color:var(--text-muted);font-size:0.88rem;}
-.profile-team{display:inline-block;margin-top:6px;font-size:0.75rem;font-weight:600;padding:3px 10px;border-radius:20px;background:rgba(59,158,255,0.12);color:var(--accent);}
-
-.tabs{display:flex;gap:4px;margin-bottom:20px;overflow-x:auto;padding-bottom:2px;}
-.tab{padding:8px 16px;border:none;border-radius:var(--r-sm);background:var(--surface2);color:var(--text-muted);font-size:0.85rem;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .18s;}
-.tab.active{background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff;}
-.tab-panel{display:none;}
-.tab-panel.active{display:block;}
-
-/* INFO GRID */
-.info-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;}
-.info-item label{font-size:0.72rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.6px;}
-.info-item p{font-size:0.92rem;color:var(--text-bright);margin-top:2px;}
-
-/* SECTION LABEL */
-.section-lbl{font-size:0.78rem;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.7px;margin:20px 0 12px;display:flex;align-items:center;gap:8px;}
-.section-lbl::after{content:'';flex:1;height:1px;background:var(--border);}
-
-/* COMMITMENT ITEMS */
-.commit-list{display:flex;flex-direction:column;gap:10px;}
-.commit-item{background:var(--surface2);border:1px solid var(--border2);border-radius:var(--r-sm);padding:14px 16px;}
-.commit-header{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;}
-.commit-title{font-weight:600;color:var(--text-bright);font-size:0.92rem;}
-.commit-meta{font-size:0.78rem;color:var(--text-muted);margin-top:4px;}
-.commit-body{font-size:0.85rem;color:var(--text);margin-top:8px;line-height:1.5;}
-.status-chip{font-size:0.72rem;font-weight:700;padding:3px 9px;border-radius:20px;white-space:nowrap;flex-shrink:0;}
-.status-pendiente{background:rgba(245,158,11,0.15);color:var(--warning);}
-.status-en-curso{background:rgba(59,158,255,0.15);color:var(--accent);}
-.status-completado{background:rgba(34,197,94,0.12);color:var(--success);}
-.status-cancelado{background:rgba(239,68,68,0.12);color:var(--danger);}
-
-/* PROGRESS BAR */
-.progress-wrap{margin-top:10px;}
-.progress-lbl{display:flex;justify-content:space-between;font-size:0.75rem;color:var(--text-muted);margin-bottom:4px;}
-.progress-bar{height:6px;background:var(--surface3);border-radius:3px;overflow:hidden;}
-.progress-fill{height:100%;background:linear-gradient(90deg,var(--primary),var(--accent));border-radius:3px;transition:width .3s;}
-
-/* FORMS */
-.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:200;align-items:center;justify-content:center;padding:16px;}
-.modal-overlay.open{display:flex;}
-.modal{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);width:100%;max-width:560px;max-height:90vh;overflow-y:auto;}
-.modal-hdr{padding:20px 20px 0;display:flex;align-items:center;justify-content:space-between;}
-.modal-hdr h3{font-size:1.05rem;font-weight:700;color:var(--text-bright);}
-.modal-close{background:none;border:none;color:var(--text-muted);font-size:1.4rem;cursor:pointer;line-height:1;}
-.modal-close:hover{color:var(--danger);}
-.modal-body{padding:20px;}
-
-.field{margin-bottom:12px;}
-.field label{display:block;font-size:0.75rem;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:.6px;margin-bottom:5px;}
-.field input,.field select,.field textarea{width:100%;padding:10px 12px;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--r-sm);color:var(--text-bright);font-size:0.9rem;transition:border-color .18s;}
-.field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:var(--accent);}
-.field textarea{resize:vertical;min-height:80px;font-family:inherit;}
-.field select option{background:var(--surface2);}
-.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-
-/* EMPTY STATE */
-.empty{text-align:center;padding:40px 20px;color:var(--text-muted);}
-.empty-icon{font-size:2.4rem;margin-bottom:12px;}
-.empty p{font-size:0.88rem;}
-
-/* STATS ROW */
-.stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px;}
-.stat-box{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);padding:16px;text-align:center;}
-.stat-val{font-size:1.6rem;font-weight:800;color:var(--accent);}
-.stat-lbl{font-size:0.72rem;color:var(--text-muted);}
-
-/* SEARCH */
-.search-bar{display:flex;gap:8px;margin-bottom:16px;}
-.search-bar input{flex:1;padding:10px 14px;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--r-sm);color:var(--text-bright);font-size:0.9rem;}
-.search-bar input:focus{outline:none;border-color:var(--accent);}
-
-/* NEWS FEED */
-.news-section{margin-bottom:28px;}
-.news-item{display:flex;align-items:flex-start;gap:12px;padding:12px 14px;border-radius:var(--r-sm);margin-bottom:8px;}
-.news-success{background:rgba(34,197,94,0.08);border:1px solid rgba(34,197,94,0.2);}
-.news-warning{background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);}
-.news-danger{background:rgba(239,68,68,0.08);border:1px solid rgba(239,68,68,0.2);}
-.news-info{background:rgba(59,158,255,0.08);border:1px solid rgba(59,158,255,0.15);}
-.news-icon{font-size:1.2rem;flex-shrink:0;margin-top:1px;}
-.news-title{font-size:0.88rem;font-weight:600;color:var(--text-bright);}
-.news-desc{font-size:0.78rem;color:var(--text-muted);margin-top:2px;}
-.news-empty{text-align:center;padding:14px;font-size:0.85rem;color:var(--text-muted);background:var(--surface);border:1px solid var(--border);border-radius:var(--r-sm);}
-.news-date{font-size:0.72rem;color:var(--text-muted);margin-bottom:10px;text-align:right;}
-
-/* TOAST */
-.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--surface3);border:1px solid var(--border);border-radius:var(--r-sm);padding:10px 20px;font-size:0.88rem;color:var(--text-bright);opacity:0;transition:all .3s;z-index:300;pointer-events:none;white-space:nowrap;}
-.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
-
-/* LOGIN */
-.login-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:16px;margin-top:8px;}
-.login-card{background:var(--surface);border:1.5px solid var(--border2);border-radius:var(--r);padding:24px 20px;cursor:pointer;transition:all .22s;text-align:center;}
-.login-card:hover{border-color:var(--accent);transform:translateY(-3px);box-shadow:0 10px 30px var(--glow);}
-.login-card.manager{border-color:rgba(251,191,36,0.35);}
-.login-card.manager:hover{border-color:#fbbf24;}
-.login-avatar{width:60px;height:60px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff;font-size:1.4rem;font-weight:800;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;}
-.login-avatar.gold{background:linear-gradient(135deg,#b45309,#fbbf24);}
-.login-name{font-weight:700;color:var(--text-bright);font-size:1rem;margin-bottom:4px;}
-.login-role{font-size:.78rem;color:var(--text-muted);}
-.user-badge{display:inline-flex;align-items:center;gap:8px;background:var(--surface2);border:1px solid var(--border2);border-radius:20px;padding:6px 14px;font-size:.8rem;color:var(--text);margin-bottom:16px;}
-.user-badge strong{color:var(--text-bright);}
-.user-badge button{background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:.8rem;padding:0 0 0 6px;}
-.user-badge button:hover{color:var(--danger);}
-/* EQUIPOS OVERVIEW */
-.eq-search{display:flex;gap:8px;margin-bottom:14px;}
-.eq-search input{flex:1;padding:10px 14px;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--r-sm);color:var(--text-bright);font-size:.9rem;}
-.eq-search input:focus{outline:none;border-color:var(--accent);}
-.eq-team-pills{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;margin-bottom:18px;}
-.eq-pill{padding:5px 14px;border:1px solid var(--border2);border-radius:20px;background:var(--surface2);color:var(--text-muted);font-size:.78rem;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .15s;}
-.eq-pill.active{color:#fff;border-color:transparent;}
-.team-panel{margin-bottom:20px;border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow);}
-.team-panel-hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:var(--surface);border-left:4px solid var(--team-color,var(--accent));border-bottom:1px solid var(--border2);}
-.team-panel-hdr-left{display:flex;align-items:center;gap:12px;min-width:0;}
-.team-panel-dot{width:10px;height:10px;border-radius:50%;background:var(--team-color,var(--accent));flex-shrink:0;}
-.team-panel-name{font-size:1rem;font-weight:800;color:var(--text-bright);}
-.team-panel-count{font-size:.75rem;color:var(--text-muted);background:var(--surface2);padding:2px 8px;border-radius:10px;margin-left:6px;}
-.team-panel-leader{font-size:.75rem;color:#fbbf24;margin-left:8px;display:flex;align-items:center;gap:4px;}
-.team-panel-actions{display:flex;gap:6px;flex-shrink:0;}
-.team-panel-body{background:var(--surface2);padding:14px;}
-.emp-cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:12px;}
-.emp-card{background:var(--surface);border:1px solid var(--border2);border-radius:var(--r-sm);padding:16px;cursor:pointer;transition:all .2s;position:relative;}
-.emp-card:hover{border-color:var(--team-color,var(--accent));transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,0.3);}
-.emp-card-top{display:flex;align-items:center;gap:12px;margin-bottom:10px;}
-.emp-card-av{width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--primary),var(--accent));color:#fff;font-size:1rem;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.emp-card-av.is-leader{background:linear-gradient(135deg,#b45309,#fbbf24);}
-.emp-card-name{font-weight:700;color:var(--text-bright);font-size:.9rem;line-height:1.3;}
-.emp-card-role{font-size:.72rem;color:var(--text-muted);margin-top:1px;}
-.emp-card-badges{display:flex;gap:4px;flex-wrap:wrap;margin-top:8px;}
-.emp-card-badge{font-size:.65rem;padding:2px 6px;border-radius:10px;font-weight:600;display:flex;align-items:center;gap:2px;}
-.ecb-warn{background:rgba(245,158,11,0.12);color:var(--warning);}
-.ecb-info{background:rgba(59,158,255,0.1);color:var(--accent);}
-.ecb-ok{background:rgba(34,197,94,0.1);color:var(--success);}
-.ecb-danger{background:rgba(239,68,68,0.1);color:var(--danger);}
-.emp-card-actions{display:flex;gap:4px;margin-top:10px;padding-top:10px;border-top:1px solid var(--border2);}
-.emp-card-action{flex:1;padding:5px 4px;border:1px solid var(--border2);border-radius:6px;background:var(--surface2);color:var(--text-muted);font-size:.68rem;cursor:pointer;text-align:center;transition:all .15s;white-space:nowrap;}
-.emp-card-action:hover{border-color:var(--accent);color:var(--accent);}
-/* PLANNER */
-.week-nav{display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:20px;}
-.week-nav h3{font-size:1rem;font-weight:700;color:var(--text-bright);min-width:220px;text-align:center;}
-.week-nav-btn{background:var(--surface2);border:1px solid var(--border2);color:var(--text);padding:7px 16px;border-radius:var(--r-sm);cursor:pointer;font-size:.9rem;}
-.week-nav-btn:hover{border-color:var(--accent);color:var(--accent);}
-.team-tabs{display:flex;gap:6px;margin-bottom:16px;overflow-x:auto;padding-bottom:4px;}
-.team-tab{padding:6px 14px;border:1px solid var(--border2);border-radius:20px;background:var(--surface2);color:var(--text-muted);font-size:.8rem;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .18s;}
-.team-tab.active{border-color:var(--accent);color:var(--accent);}
-.planner-wrap{overflow-x:auto;margin-bottom:12px;}
-.planner-table{width:100%;border-collapse:collapse;min-width:560px;}
-.planner-table th{font-size:.7rem;font-weight:700;color:var(--text-muted);text-align:center;padding:8px 3px;background:var(--surface2);border-bottom:1px solid var(--border);}
-.planner-table th.col-name{text-align:left;padding-left:12px;min-width:140px;}
-.planner-table th.col-holiday{color:var(--danger);background:rgba(239,68,68,0.07);}
-.planner-table th.col-weekend{color:var(--text-muted);opacity:.6;}
-.planner-table td{padding:6px 3px;border-bottom:1px solid var(--border2);vertical-align:middle;}
-.planner-table td.col-name{padding-left:12px;}
-.p-name{font-size:.83rem;font-weight:600;color:var(--text-bright);}
-.p-role{font-size:.7rem;color:var(--text-muted);}
-.day-btns{display:flex;gap:2px;justify-content:center;}
-.day-btn{width:26px;height:26px;border-radius:6px;border:1px solid var(--border2);background:var(--surface2);color:var(--text-muted);font-size:.68rem;font-weight:700;cursor:pointer;transition:all .15s;}
-.day-btn:hover:not(:disabled){border-color:var(--accent);}
-.day-btn.on-T{background:var(--accent);border-color:var(--accent);color:#fff;}
-.day-btn.on-V{background:var(--success);border-color:var(--success);color:#fff;}
-.day-btn.on-C{background:var(--warning);border-color:var(--warning);color:#000;}
-.day-btn:disabled{opacity:.2;cursor:not-allowed;}
-.planner-legend{font-size:.72rem;color:var(--text-muted);display:flex;flex-wrap:wrap;gap:12px;padding:8px 0;}
-.planner-legend span{display:flex;align-items:center;gap:4px;}
-.l-T{color:var(--accent);}
-.l-V{color:var(--success);}
-.l-C{color:var(--warning);}
-.planner-restriction{font-size:.72rem;background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:var(--r-sm);padding:8px 12px;color:var(--warning);margin-bottom:12px;}
-/* CALENDAR */
-.cal-header-row{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:3px;}
-.cal-header-cell{text-align:center;font-size:.7rem;font-weight:700;color:var(--text-muted);padding:5px 0;text-transform:uppercase;}
-.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;}
-.cal-day{background:var(--surface);border:1px solid var(--border2);border-radius:var(--r-sm);min-height:76px;padding:6px;cursor:pointer;transition:border-color .15s;display:flex;flex-direction:column;}
-.cal-day:hover:not(.other-month){border-color:var(--accent);}
-.cal-day.other-month{opacity:.25;pointer-events:none;}
-.cal-day.weekend{background:var(--surface2);}
-.cal-day.holiday{background:rgba(239,68,68,0.07);border-color:rgba(239,68,68,0.28);}
-.cal-day.today{border-color:var(--accent);}
-.cal-num{font-size:.78rem;font-weight:700;color:var(--text-muted);}
-.cal-day.today .cal-num{color:var(--accent);}
-.cal-day.holiday .cal-num{color:var(--danger);}
-.cal-hday{font-size:.58rem;color:var(--danger);line-height:1.2;margin-top:1px;}
-.cal-chips{display:flex;flex-direction:column;gap:2px;margin-top:4px;flex:1;}
-.cal-chip{font-size:.6rem;line-height:1.3;}
-.cal-chip-T{color:var(--accent);}
-.cal-chip-V{color:var(--success);}
-.cal-chip-C{color:var(--warning);}
-.cal-legend{display:flex;gap:16px;font-size:.75rem;color:var(--text-muted);margin-top:12px;flex-wrap:wrap;}
-@media(max-width:600px){
-  .cal-day{min-height:52px;padding:4px;}
-  .cal-chips{display:none;}
-  .stats-row{grid-template-columns:repeat(2,1fr);}
-  .grid-2{grid-template-columns:1fr;}
-  .profile-hero{flex-direction:column;text-align:center;}
-}
-/* LOGIN FORM */
-.login-form-wrap{max-width:420px;margin:0 auto;padding:8px 0 32px;}
-.login-form-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:32px 28px;box-shadow:var(--shadow);}
-.login-hint{font-size:.75rem;color:var(--text-muted);text-align:center;margin-top:16px;line-height:1.6;}
-.pw-wrap{position:relative;}
-.pw-wrap input{padding-right:72px;}
-.pw-show{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:.75rem;font-weight:600;}
-.pw-show:hover{color:var(--accent);}
-.login-err{font-size:.82rem;color:var(--danger);text-align:center;margin-bottom:10px;display:none;padding:8px;background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.2);border-radius:var(--r-sm);}
-@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}
-/* PERMISOS */
-.user-row{background:var(--surface);border:1px solid var(--border2);border-radius:var(--r-sm);padding:16px;display:flex;align-items:flex-start;gap:14px;margin-bottom:10px;}
-.urb{font-size:.7rem;font-weight:700;padding:2px 8px;border-radius:10px;}
-.urb-manager{background:rgba(251,191,36,.15);color:#fbbf24;}
-.urb-leader{background:rgba(59,158,255,.12);color:var(--accent);}
-.mod-pills{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;}
-.mod-pill{font-size:.72rem;font-weight:600;padding:4px 10px;border:1px solid var(--border2);border-radius:12px;background:var(--surface2);color:var(--text-muted);cursor:pointer;transition:all .15s;user-select:none;}
-.mod-pill.on{background:rgba(59,158,255,.12);border-color:var(--accent);color:var(--accent);}
-.mod-pill:hover{border-color:var(--accent);}
-</style>
+  <script type="module" crossorigin src="/Juego-Tecnolog-a-prueba-/assets/index-DIhpubTz.js"></script>
+  <link rel="stylesheet" crossorigin href="/Juego-Tecnolog-a-prueba-/assets/index-ChsZ8Cd6.css">
 </head>
 <body>
 
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
+
+<!-- LOADING OVERLAY -->
+<div class="loading-overlay" id="loading-overlay">
+  <div class="spinner"></div>
+  <div style="font-size:.85rem;color:var(--text-muted)">Cargando…</div>
+</div>
 
 <!-- LOGIN SCREEN -->
 <div class="screen active" id="screen-login">
@@ -330,9 +39,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica N
           <button class="pw-show" type="button" onclick="toggleLoginPass()">Mostrar</button>
         </div>
       </div>
-      <div class="login-err" id="login-err">Correo o contraseña incorrectos</div>
+      <div class="login-err" id="login-err"></div>
       <button class="btn btn-primary btn-full" onclick="attemptLogin()">Ingresar →</button>
-      <div class="login-hint">¿Problemas para ingresar? Contacta al administrador del sistema.<br>En una próxima versión se integrará con Entra ID de Microsoft.</div>
+      <div class="login-hint">¿Problemas para ingresar? Contacta al administrador.<br>Próximamente: integración con Microsoft Entra ID.</div>
     </div>
   </div>
 </div>
@@ -360,15 +69,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica N
     <div class="app-logo">👥 Mi Equipo</div>
     <div class="app-tagline">Gestión del ciclo de vida laboral · AquaChile</div>
   </div>
-
   <div class="stats-row" id="home-stats"></div>
-
   <div class="news-section">
     <div class="section-lbl">Novedades del día</div>
     <div class="news-date" id="news-date"></div>
     <div id="news-container"></div>
   </div>
-
   <div class="page-hdr">
     <h2>Equipos</h2>
     <button class="btn btn-sm btn-ghost" onclick="openTeamForm()">+ Equipo</button>
@@ -400,7 +106,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica N
 <div class="container">
   <button class="back-btn" id="emp-back-btn" onclick="backToTeam()">← Volver al equipo</button>
   <div class="profile-hero" id="profile-hero"></div>
-
   <div class="tabs" id="profile-tabs">
     <button class="tab active" onclick="showTab('personal',this)">Personal</button>
     <button class="tab" onclick="showTab('laboral',this)">Laboral</button>
@@ -409,7 +114,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica N
     <button class="tab" onclick="showTab('capacitaciones',this)">Capacitaciones</button>
     <button class="tab" onclick="showTab('reconocimientos',this)">Reconoc.</button>
   </div>
-
   <!-- Personal -->
   <div class="tab-panel active" id="tab-personal">
     <div class="card">
@@ -418,15 +122,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica N
         <button class="btn btn-sm btn-ghost" onclick="openEmployeeForm(true)">Editar</button>
       </div>
       <div class="info-grid" id="info-personal"></div>
-
       <div class="section-lbl">Familia</div>
       <div class="info-grid" id="info-familia"></div>
-
       <div class="section-lbl">Formación</div>
       <div class="info-grid" id="info-formacion"></div>
     </div>
   </div>
-
   <!-- Laboral -->
   <div class="tab-panel" id="tab-laboral">
     <div class="card">
@@ -437,7 +138,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica N
       <div class="info-grid" id="info-laboral"></div>
     </div>
   </div>
-
   <!-- Objetivos -->
   <div class="tab-panel" id="tab-objetivos">
     <div class="page-hdr">
@@ -446,7 +146,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica N
     </div>
     <div class="commit-list" id="list-objetivos"></div>
   </div>
-
   <!-- Conversaciones -->
   <div class="tab-panel" id="tab-conversaciones">
     <div class="page-hdr">
@@ -455,7 +154,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica N
     </div>
     <div class="commit-list" id="list-conversaciones"></div>
   </div>
-
   <!-- Capacitaciones -->
   <div class="tab-panel" id="tab-capacitaciones">
     <div class="page-hdr">
@@ -464,7 +162,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica N
     </div>
     <div class="commit-list" id="list-capacitaciones"></div>
   </div>
-
   <!-- Reconocimientos -->
   <div class="tab-panel" id="tab-reconocimientos">
     <div class="page-hdr">
@@ -498,7 +195,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica N
     <span><span class="day-btn on-T" style="display:inline-flex;align-items:center;justify-content:center;pointer-events:none">T</span> <span class="l-T">Teletrabajo</span></span>
     <span><span class="day-btn on-V" style="display:inline-flex;align-items:center;justify-content:center;pointer-events:none">V</span> <span class="l-V">Vacaciones</span></span>
     <span><span class="day-btn on-C" style="display:inline-flex;align-items:center;justify-content:center;pointer-events:none">C</span> <span class="l-C">Compensado</span></span>
-    <span style="color:var(--text-muted)">Gris = feriado / fin de semana (T y C deshabilitados)</span>
   </div>
 </div>
 </div>
@@ -519,8 +215,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica N
     <button id="cal-btn-work" class="btn btn-sm btn-ghost" onclick="setCalView('work')">Semana laboral (L–V)</button>
   </div>
   <div id="cal-wrap">
-  <div class="cal-header-row" id="cal-header"></div>
-  <div class="cal-grid" id="cal-grid"></div>
+    <div class="cal-header-row" id="cal-header"></div>
+    <div class="cal-grid" id="cal-grid"></div>
   </div>
   <div class="cal-legend">
     <span>💻 Teletrabajo</span><span>🌴 Vacaciones</span><span>📅 Compensado</span>
@@ -554,7 +250,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica N
   </div>
   <div class="modal-body">
     <input type="hidden" id="team-id"/>
-    <div class="field"><label>Nombre del Equipo</label><input type="text" id="team-name" placeholder="Ej: Infraestructura, Desarrollo…"/></div>
+    <div class="field"><label>Nombre del Equipo</label><input type="text" id="team-name" placeholder="Ej: Infraestructura…"/></div>
     <div class="field"><label>Color</label>
       <select id="team-color">
         <option value="#3b9eff">Azul</option>
@@ -567,9 +263,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica N
     <div class="field">
       <label>Líder / Jefe de equipo</label>
       <select id="team-lead"><option value="">— Sin líder —</option></select>
-      <div id="team-lead-hint" style="font-size:.75rem;color:var(--text-muted);margin-top:5px;display:none">Agrega miembros al equipo primero para asignar un líder.</div>
+      <div id="team-lead-hint" style="font-size:.75rem;color:var(--text-muted);margin-top:5px;display:none">Agrega miembros al equipo primero.</div>
     </div>
-    <div class="field"><label>Descripción (opcional)</label><textarea id="team-desc" rows="2" placeholder="Funciones principales del equipo…"></textarea></div>
+    <div class="field"><label>Descripción (opcional)</label><textarea id="team-desc" rows="2"></textarea></div>
     <div style="display:flex;gap:8px;margin-top:16px;">
       <button class="btn btn-primary btn-full" onclick="saveTeam()">Guardar</button>
       <button class="btn btn-ghost" onclick="closeModal('modal-team')">Cancelar</button>
@@ -589,18 +285,17 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica N
     <input type="hidden" id="emp-id"/>
     <div class="section-lbl" style="margin-top:0">Datos Personales</div>
     <div class="grid-2">
-      <div class="field"><label>Nombre</label><input type="text" id="emp-nombre" placeholder="Nombre"/></div>
-      <div class="field"><label>Apellido</label><input type="text" id="emp-apellido" placeholder="Apellido"/></div>
+      <div class="field"><label>Nombre</label><input type="text" id="emp-nombre"/></div>
+      <div class="field"><label>Apellido</label><input type="text" id="emp-apellido"/></div>
     </div>
     <div class="grid-2">
       <div class="field"><label>RUT</label><input type="text" id="emp-rut" placeholder="12.345.678-9"/></div>
       <div class="field"><label>Fecha de nacimiento</label><input type="date" id="emp-nacimiento"/></div>
     </div>
     <div class="grid-2">
-      <div class="field"><label>Email</label><input type="email" id="emp-email" placeholder="correo@aquachile.com"/></div>
-      <div class="field"><label>Teléfono</label><input type="tel" id="emp-tel" placeholder="+56 9 1234 5678"/></div>
+      <div class="field"><label>Email</label><input type="email" id="emp-email"/></div>
+      <div class="field"><label>Teléfono</label><input type="tel" id="emp-tel"/></div>
     </div>
-
     <div class="section-lbl">Familia</div>
     <div class="grid-2">
       <div class="field"><label>Estado Civil</label>
@@ -610,13 +305,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica N
           <option>Conviviente</option><option>Divorciado/a</option><option>Viudo/a</option>
         </select>
       </div>
-      <div class="field"><label>N° de hijos</label><input type="number" id="emp-hijos" min="0" placeholder="0"/></div>
+      <div class="field"><label>N° de hijos</label><input type="number" id="emp-hijos" min="0"/></div>
     </div>
     <div class="grid-2">
-      <div class="field"><label>Contacto emergencia</label><input type="text" id="emp-emerg-nombre" placeholder="Nombre"/></div>
-      <div class="field"><label>Tel. emergencia</label><input type="tel" id="emp-emerg-tel" placeholder="+56 9…"/></div>
+      <div class="field"><label>Contacto emergencia</label><input type="text" id="emp-emerg-nombre"/></div>
+      <div class="field"><label>Tel. emergencia</label><input type="tel" id="emp-emerg-tel"/></div>
     </div>
-
     <div class="section-lbl">Formación</div>
     <div class="field"><label>Nivel educacional</label>
       <select id="emp-educacion">
@@ -625,12 +319,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica N
         <option>Universitaria</option><option>Postgrado / Magíster</option><option>Doctorado</option>
       </select>
     </div>
-    <div class="field"><label>Título / Profesión</label><input type="text" id="emp-titulo" placeholder="Ej: Ingeniero Civil Informático"/></div>
-    <div class="field"><label>Certificaciones (separadas por coma)</label><input type="text" id="emp-cert" placeholder="AWS, PMP, Scrum Master…"/></div>
+    <div class="field"><label>Título / Profesión</label><input type="text" id="emp-titulo"/></div>
+    <div class="field"><label>Certificaciones (separadas por coma)</label><input type="text" id="emp-cert" placeholder="AWS, PMP…"/></div>
     <div class="field"><label>Idiomas</label><input type="text" id="emp-idiomas" placeholder="Español, Inglés B2…"/></div>
-
     <div class="section-lbl">Datos Laborales</div>
-    <div class="field"><label>Cargo</label><input type="text" id="emp-cargo" placeholder="Ej: Analista de Sistemas"/></div>
+    <div class="field"><label>Cargo</label><input type="text" id="emp-cargo"/></div>
     <div class="grid-2">
       <div class="field"><label>Fecha de ingreso</label><input type="date" id="emp-ingreso"/></div>
       <div class="field"><label>Tipo de contrato</label>
@@ -642,7 +335,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica N
       </div>
     </div>
     <div class="grid-2">
-      <div class="field"><label>Centro de costo</label><input type="text" id="emp-ceco" placeholder="Ej: TI-001"/></div>
+      <div class="field"><label>Centro de costo</label><input type="text" id="emp-ceco"/></div>
       <div class="field"><label>Jornada</label>
         <select id="emp-jornada">
           <option value="">— Seleccionar —</option>
@@ -650,7 +343,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica N
         </select>
       </div>
     </div>
-
     <div style="display:flex;gap:8px;margin-top:16px;">
       <button class="btn btn-primary btn-full" onclick="saveEmployee()">Guardar</button>
       <button class="btn btn-ghost" onclick="closeModal('modal-employee')">Cancelar</button>
@@ -679,7 +371,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica N
   </div>
   <div class="modal-body">
     <div class="field"><label>Motivo del día compensado</label>
-      <textarea id="comp-motivo" rows="3" placeholder="Ej: Compensación por trabajo en feriado, horas extras, etc."></textarea>
+      <textarea id="comp-motivo" rows="3" placeholder="Ej: Compensación por trabajo en feriado…"></textarea>
     </div>
     <div style="display:flex;gap:8px;margin-top:12px">
       <button class="btn btn-primary btn-full" onclick="saveCompensado()">Guardar</button>
@@ -710,11 +402,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica N
   <div class="modal-body">
     <input type="hidden" id="uf-id"/>
     <div class="grid-2">
-      <div class="field"><label>Nombre completo</label><input type="text" id="uf-name" placeholder="Nombre Apellido"/></div>
-      <div class="field"><label>Correo electrónico</label><input type="email" id="uf-email" placeholder="correo@aquachile.com"/></div>
+      <div class="field"><label>Nombre completo</label><input type="text" id="uf-name"/></div>
+      <div class="field"><label>Correo electrónico</label><input type="email" id="uf-email"/></div>
     </div>
     <div class="field">
-      <label>Contraseña <span id="uf-pass-hint" style="font-weight:400;color:var(--text-muted)">(dejar vacío para no cambiar)</span></label>
+      <label>Contraseña <span id="uf-pass-hint" style="font-weight:400;color:var(--text-muted)">(vacío = sin cambio)</span></label>
       <div class="pw-wrap">
         <input type="password" id="uf-pass" placeholder="Nueva contraseña"/>
         <button class="pw-show" type="button" onclick="toggleUfPass()">Mostrar</button>
@@ -770,1339 +462,5 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica N
   </button>
 </nav>
 
-<script>
-// ── DATA ──────────────────────────────────────────────────────────────────────
-const STORE_KEY = 'eq_mgr_v1';
-
-function load() {
-  try {
-    const data = JSON.parse(localStorage.getItem(STORE_KEY)) || defaultData();
-    if (!data.attendance) data.attendance = [];
-    if (!data.users) data.users = defaultData().users;
-    // Migrate old team names
-    const rename = {'Infraestructura':'Operaciones TI','Desarrollo':'Sistemas y Procesos',
-      'Datos & Analytics':'Nuevas Tecnologías','Seguridad':'Gestión y Servicios TI','Soporte':'Gobierno de Datos'};
-    (data.teams||[]).forEach(t => { if (rename[t.name]) t.name = rename[t.name]; });
-    return data;
-  } catch(e) { return defaultData(); }
-}
-
-function save(db) { localStorage.setItem(STORE_KEY, JSON.stringify(db)); }
-
-function defaultData() {
-  return {
-    teams: [
-      { id: 't1', name: 'Operaciones TI', color: '#3b9eff', leadId: '', desc: '' },
-      { id: 't2', name: 'Sistemas y Procesos', color: '#22c55e', leadId: '', desc: '' },
-      { id: 't3', name: 'Nuevas Tecnologías', color: '#a855f7', leadId: '', desc: '' },
-      { id: 't4', name: 'Gestión y Servicios TI', color: '#ef4444', leadId: '', desc: '' },
-      { id: 't5', name: 'Gobierno de Datos', color: '#f59e0b', leadId: '', desc: '' }
-    ],
-    employees: [],
-    attendance: [],
-    users: [
-      { id: 'u-admin', email: 'gerente@aquachile.com', password: 'AquaChile2026',
-        name: 'Gerente del Área', role: 'manager', teamId: null, empId: null,
-        modules: ['home','equipos','planner','calendar','permisos'] }
-    ]
-  };
-}
-
-let db = load();
-let currentTeamId = null;
-let currentEmpId = null;
-let currentCommitType = null;
-let editingCommitId = null;
-let eqFilter = '';
-let eqPillActive = 'all';
-
-// ── NAVIGATION ────────────────────────────────────────────────────────────────
-function showScreen(name) {
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById('screen-' + name).classList.add('active');
-  document.querySelector('.nav-bar').style.display = name === 'login' ? 'none' : '';
-  if (name === 'home') renderHome();
-  if (name === 'equipos') renderEquipos();
-  if (name === 'team') renderTeam();
-  if (name === 'employee') renderEmployee();
-  if (name === 'planner') renderPlanner();
-  if (name === 'calendar') renderCalendar();
-  if (name === 'permisos') renderPermisos();
-}
-
-function setNav(id) {
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-}
-
-function backToTeam() {
-  document.getElementById('nav-emp').style.display = 'none';
-  showScreen('equipos');
-  setNav('nav-equipos');
-}
-
-// ── EQUIPOS OVERVIEW ─────────────────────────────────────────────────────────
-function renderEquipos() {
-  const pillsEl = document.getElementById('eq-pills');
-  pillsEl.innerHTML =
-    `<div class="eq-pill${eqPillActive==='all'?' active':''}" data-tid="all" onclick="setEqPill('all')"
-      style="${eqPillActive==='all'?'background:var(--accent);border-color:var(--accent);color:#fff':''}">Todos</div>` +
-    db.teams.map(t =>
-      `<div class="eq-pill${eqPillActive===t.id?' active':''}" data-tid="${t.id}" onclick="setEqPill('${t.id}')"
-        style="${eqPillActive===t.id?`background:${t.color};border-color:${t.color};color:#fff`:''}">
-        ${t.name}</div>`).join('');
-  renderEquiposPanels();
-}
-
-function setEqPill(tid) {
-  eqPillActive = tid;
-  document.querySelectorAll('.eq-pill').forEach(p =>
-    p.classList.toggle('active', p.dataset.tid === tid));
-  document.querySelectorAll('.eq-pill').forEach(p => {
-    if (p.dataset.tid === 'all') {
-      p.style = tid === 'all' ? 'background:var(--accent);border-color:var(--accent);color:#fff' : '';
-    } else {
-      const t = db.teams.find(x => x.id === p.dataset.tid);
-      p.style = (t && tid === t.id) ? `background:${t.color};border-color:${t.color};color:#fff` : '';
-    }
-  });
-  renderEquiposPanels();
-}
-
-function filterEquipos() {
-  eqFilter = (document.getElementById('eq-search-input').value || '').toLowerCase();
-  renderEquiposPanels();
-}
-
-function renderEquiposPanels() {
-  const user = getCurrentUser();
-  const isLeader = user && user.type === 'leader';
-  const teamsToShow = eqPillActive === 'all' ? db.teams : db.teams.filter(t => t.id === eqPillActive);
-  const panels = document.getElementById('eq-panels');
-
-  if (!teamsToShow.length) {
-    panels.innerHTML = '<div class="empty"><div class="empty-icon">👥</div><p>Sin equipos</p></div>';
-    return;
-  }
-
-  panels.innerHTML = teamsToShow.map(t => {
-    const allMembers = db.employees.filter(e => e.teamId === t.id);
-    const members = allMembers.filter(e =>
-      !eqFilter || (e.nombre+' '+e.apellido+' '+(e.cargo||'')).toLowerCase().includes(eqFilter));
-    const leader = t.leadId ? db.employees.find(e => e.id === t.leadId) : null;
-    const canEdit = !isLeader || user.teamId === t.id;
-    const today = new Date(); today.setHours(0,0,0,0);
-
-    const empCards = members.map(e => {
-      const initials = ((e.nombre||'?')[0]+(e.apellido||'')[0]).toUpperCase();
-      const isLead = t.leadId === e.id;
-      const pendObj = (e.objetivos||[]).filter(o => o.estado === 'Pendiente').length;
-      const pendCap = (e.capacitaciones||[]).filter(c => c.estado === 'Pendiente').length;
-      const convs = (e.conversaciones||[]).filter(c => c.fecha).sort((a,b) => b.fecha.localeCompare(a.fecha));
-      const lastConv = convs[0];
-      const daysSince = lastConv ? Math.round((today - new Date(lastConv.fecha+'T00:00:00'))/(1000*60*60*24)) : null;
-      const convOld = daysSince !== null && daysSince >= 30;
-
-      const badges = [
-        isLead ? `<span class="emp-card-badge ecb-info">👑 Líder</span>` : '',
-        pendObj ? `<span class="emp-card-badge ecb-warn">⚠ ${pendObj} obj</span>` : '',
-        pendCap ? `<span class="emp-card-badge ecb-warn">📚 ${pendCap} cap</span>` : '',
-        convOld ? `<span class="emp-card-badge ecb-danger">💬 ${daysSince}d sin 1:1</span>` :
-          (lastConv ? `<span class="emp-card-badge ecb-ok">💬 ${convs.length} 1:1</span>` : ''),
-      ].filter(Boolean).join('');
-
-      const actions = canEdit ? `<div class="emp-card-actions">
-        <button class="emp-card-action" onclick="event.stopPropagation();openEmpEditFromEq('${t.id}','${e.id}')">✏ Editar</button>
-        <button class="emp-card-action" onclick="event.stopPropagation();openCommitFromEq('${e.id}','objetivo')">🎯 Obj</button>
-        <button class="emp-card-action" onclick="event.stopPropagation();openCommitFromEq('${e.id}','conversacion')">💬 1:1</button>
-      </div>` : '';
-
-      return `<div class="emp-card" style="--team-color:${t.color}" onclick="openEmployee('${e.id}')">
-        <div class="emp-card-top">
-          <div class="emp-card-av${isLead?' is-leader':''}">${isLead?'👑':initials}</div>
-          <div style="min-width:0">
-            <div class="emp-card-name">${e.nombre} ${e.apellido}</div>
-            <div class="emp-card-role">${e.cargo||'Sin cargo'}</div>
-          </div>
-        </div>
-        ${badges ? `<div class="emp-card-badges">${badges}</div>` : ''}
-        ${actions}
-      </div>`;
-    }).join('');
-
-    const bodyContent = members.length
-      ? `<div class="emp-cards-grid">${empCards}</div>`
-      : `<div class="empty" style="padding:20px"><p>${eqFilter?'Sin resultados':'Sin personas en este equipo'}</p></div>`;
-
-    return `<div class="team-panel" style="--team-color:${t.color}" id="panel-${t.id}">
-      <div class="team-panel-hdr">
-        <div class="team-panel-hdr-left">
-          <div class="team-panel-dot"></div>
-          <div class="team-panel-name">${t.name}</div>
-          <span class="team-panel-count">${allMembers.length} persona${allMembers.length!==1?'s':''}</span>
-          ${leader ? `<span class="team-panel-leader">👑 ${leader.nombre} ${leader.apellido}</span>` : ''}
-        </div>
-        <div class="team-panel-actions">
-          ${canEdit ? `<button class="btn btn-sm btn-ghost" onclick="editTeamFromEq('${t.id}')">Editar equipo</button>` : ''}
-          ${canEdit ? `<button class="btn btn-sm btn-primary" onclick="addEmpToTeam('${t.id}')">+ Persona</button>` : ''}
-        </div>
-      </div>
-      <div class="team-panel-body">${bodyContent}</div>
-    </div>`;
-  }).join('');
-}
-
-function editTeamFromEq(tid) {
-  currentTeamId = tid;
-  openTeamForm(true);
-}
-
-function addEmpToTeam(tid) {
-  currentTeamId = tid;
-  openEmployeeForm(false);
-}
-
-function openEmpEditFromEq(tid, eid) {
-  currentTeamId = tid;
-  currentEmpId = eid;
-  openEmployeeForm(true);
-}
-
-function openCommitFromEq(eid, type) {
-  currentEmpId = eid;
-  openCommitForm(type);
-}
-
-// ── HOME ──────────────────────────────────────────────────────────────────────
-function renderHome() {
-  const totalEmp = db.employees.length;
-  const totalObj = db.employees.reduce((a,e) => a + (e.objetivos||[]).length, 0);
-  const totalCap = db.employees.reduce((a,e) => a + (e.capacitaciones||[]).length, 0);
-  const pending = db.employees.reduce((a,e) =>
-    a + (e.objetivos||[]).filter(o=>o.estado==='Pendiente').length +
-        (e.capacitaciones||[]).filter(c=>c.estado==='Pendiente').length, 0);
-
-  renderNews();
-  document.getElementById('home-stats').innerHTML = `
-    <div class="stat-box"><div class="stat-val">${db.teams.length}</div><div class="stat-lbl">Equipos</div></div>
-    <div class="stat-box"><div class="stat-val">${totalEmp}</div><div class="stat-lbl">Personas</div></div>
-    <div class="stat-box"><div class="stat-val">${totalObj}</div><div class="stat-lbl">Objetivos</div></div>
-    <div class="stat-box"><div class="stat-val">${pending}</div><div class="stat-lbl">Pendientes</div></div>
-  `;
-
-  const grid = document.getElementById('teams-grid');
-  if (!db.teams.length) { grid.innerHTML = '<div class="empty"><div class="empty-icon">👥</div><p>Agrega tu primer equipo</p></div>'; return; }
-
-  grid.innerHTML = db.teams.map(t => {
-    const members = db.employees.filter(e => e.teamId === t.id);
-    const pendObj = members.reduce((a,e)=> a+(e.objetivos||[]).filter(o=>o.estado==='Pendiente').length,0);
-    return `<div class="team-tile" style="--team-color:${t.color}" onclick="openTeam('${t.id}')">
-      <div class="team-name">${t.name}</div>
-      ${(()=>{ const l=t.leadId?db.employees.find(e=>e.id===t.leadId):null; return l?`<div style="font-size:.8rem;color:var(--text-muted)">👑 Líder: ${l.nombre} ${l.apellido}</div>`:''; })()}
-      <div class="team-stats">
-        <div class="team-stat"><div class="team-stat-val">${members.length}</div><div class="team-stat-lbl">Personas</div></div>
-        <div class="team-stat"><div class="team-stat-val">${members.reduce((a,e)=>(a+(e.objetivos||[]).length),0)}</div><div class="team-stat-lbl">Objetivos</div></div>
-        <div class="team-stat"><div class="team-stat-val">${pendObj}</div><div class="team-stat-lbl">Pendientes</div></div>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-// ── TEAM ──────────────────────────────────────────────────────────────────────
-function openTeam(tid) {
-  currentTeamId = tid;
-  eqPillActive = tid;
-  showScreen('equipos');
-  setNav('nav-equipos');
-}
-
-function renderTeam() {
-  const t = db.teams.find(t => t.id === currentTeamId);
-  if (!t) return;
-  document.getElementById('team-screen-name').textContent = t.name;
-  filterMembers();
-}
-
-function filterMembers() {
-  const q = (document.getElementById('member-search').value || '').toLowerCase();
-  const members = db.employees.filter(e => e.teamId === currentTeamId &&
-    (!q || (e.nombre+' '+e.apellido+' '+e.cargo).toLowerCase().includes(q)));
-
-  const grid = document.getElementById('members-grid');
-  if (!members.length) {
-    grid.innerHTML = '<div class="empty" style="grid-column:1/-1"><div class="empty-icon">👤</div><p>No hay personas en este equipo</p></div>';
-    return;
-  }
-  const team = db.teams.find(t => t.id === currentTeamId);
-  grid.innerHTML = members.map(e => {
-    const initials = ((e.nombre||'?')[0]+(e.apellido||'')[0]).toUpperCase();
-    const pendObj = (e.objetivos||[]).filter(o=>o.estado==='Pendiente').length;
-    const pendCap = (e.capacitaciones||[]).filter(c=>c.estado==='Pendiente').length;
-    const isLeader = team && team.leadId === e.id;
-    return `<div class="member-card${isLeader?' member-leader':''}" onclick="openEmployee('${e.id}')">
-      <div class="avatar">${isLeader?'👑':initials}</div>
-      <div class="member-info">
-        <div class="member-name">${e.nombre} ${e.apellido}</div>
-        <div class="member-role">${e.cargo||'Sin cargo'}</div>
-        <div class="member-badges">
-          ${isLeader ? `<span class="badge badge-leader">Líder</span>` : ''}
-          ${pendObj ? `<span class="badge badge-pending">${pendObj} obj.</span>` : ''}
-          ${pendCap ? `<span class="badge badge-pending">${pendCap} cap.</span>` : ''}
-          ${(e.conversaciones||[]).length ? `<span class="badge badge-info">${(e.conversaciones||[]).length} 1:1</span>` : ''}
-        </div>
-      </div>
-    </div>`;
-  }).join('');
-}
-
-// ── EMPLOYEE ──────────────────────────────────────────────────────────────────
-function openEmployee(eid) {
-  currentEmpId = eid;
-  document.getElementById('nav-emp').style.display = 'flex';
-  showScreen('employee');
-  setNav('nav-emp');
-  // reset tabs
-  document.querySelectorAll('.tab').forEach((t,i) => t.classList.toggle('active', i===0));
-  document.querySelectorAll('.tab-panel').forEach((p,i) => p.classList.toggle('active', i===0));
-}
-
-function renderEmployee() {
-  const e = db.employees.find(e => e.id === currentEmpId);
-  if (!e) return;
-  const t = db.teams.find(t => t.id === e.teamId);
-  const initials = ((e.nombre||'?')[0]+(e.apellido||'')[0]).toUpperCase();
-
-  document.getElementById('profile-hero').innerHTML = `
-    <div class="profile-avatar">${initials}</div>
-    <div>
-      <div class="profile-name">${e.nombre} ${e.apellido}</div>
-      <div class="profile-role">${e.cargo||'Sin cargo definido'}</div>
-      ${t ? `<span class="profile-team" style="background:${t.color}22;color:${t.color}">${t.name}</span>` : ''}
-    </div>
-    <div style="margin-left:auto;display:flex;gap:6px;">
-      <button class="btn btn-sm btn-ghost" onclick="deleteEmployee('${e.id}')">Eliminar</button>
-    </div>
-  `;
-
-  // Personal
-  document.getElementById('info-personal').innerHTML = infoItems([
-    ['Nombre completo', `${e.nombre} ${e.apellido}`],
-    ['RUT', e.rut], ['Email', e.email], ['Teléfono', e.tel],
-    ['Fecha de nacimiento', e.nacimiento ? fmtDate(e.nacimiento) : '—'],
-    ['Edad', e.nacimiento ? calcAge(e.nacimiento)+' años' : '—'],
-  ]);
-
-  document.getElementById('info-familia').innerHTML = infoItems([
-    ['Estado civil', e.estadoCivil], ['N° de hijos', e.hijos ?? '—'],
-    ['Contacto emergencia', e.emergNombre], ['Tel. emergencia', e.emergTel],
-  ]);
-
-  document.getElementById('info-formacion').innerHTML = infoItems([
-    ['Nivel educacional', e.educacion], ['Título / Profesión', e.titulo],
-    ['Certificaciones', e.cert], ['Idiomas', e.idiomas],
-  ]);
-
-  // Laboral
-  document.getElementById('info-laboral').innerHTML = infoItems([
-    ['Cargo', e.cargo], ['Tipo de contrato', e.contrato],
-    ['Fecha de ingreso', e.ingreso ? fmtDate(e.ingreso) : '—'],
-    ['Antigüedad', e.ingreso ? calcAge(e.ingreso)+' años' : '—'],
-    ['Centro de costo', e.ceco], ['Jornada', e.jornada],
-    ['Equipo', t ? t.name : '—'],
-  ]);
-
-  renderCommitList('objetivos', e.objetivos||[], renderObjetivo);
-  renderCommitList('conversaciones', e.conversaciones||[], renderConversacion);
-  renderCommitList('capacitaciones', e.capacitaciones||[], renderCapacitacion);
-  renderCommitList('reconocimientos', e.reconocimientos||[], renderReconocimiento);
-}
-
-function infoItems(pairs) {
-  return pairs.map(([l,v]) => `<div class="info-item"><label>${l}</label><p>${v||'—'}</p></div>`).join('');
-}
-
-function renderCommitList(type, items, renderFn) {
-  const el = document.getElementById('list-'+type);
-  if (!items.length) { el.innerHTML = '<div class="empty"><div class="empty-icon">📋</div><p>Sin registros aún</p></div>'; return; }
-  el.innerHTML = items.map(item => renderFn(item)).join('');
-}
-
-function renderObjetivo(o) {
-  return `<div class="commit-item">
-    <div class="commit-header">
-      <div>
-        <div class="commit-title">${o.titulo}</div>
-        <div class="commit-meta">Vence: ${o.fechaLimite ? fmtDate(o.fechaLimite) : '—'}</div>
-      </div>
-      <div style="display:flex;gap:6px;align-items:center">
-        <span class="status-chip status-${slugify(o.estado)}">${o.estado}</span>
-        <button class="btn btn-sm btn-ghost" onclick="openCommitForm('objetivo','${o.id}')">✏</button>
-        <button class="btn btn-sm btn-danger" onclick="deleteCommit('objetivos','${o.id}')">✕</button>
-      </div>
-    </div>
-    ${o.descripcion ? `<div class="commit-body">${o.descripcion}</div>` : ''}
-    <div class="progress-wrap">
-      <div class="progress-lbl"><span>Avance</span><span>${o.progreso||0}%</span></div>
-      <div class="progress-bar"><div class="progress-fill" style="width:${o.progreso||0}%"></div></div>
-    </div>
-  </div>`;
-}
-
-function renderConversacion(c) {
-  return `<div class="commit-item">
-    <div class="commit-header">
-      <div>
-        <div class="commit-title">${c.tipo||'1:1'} · ${c.fecha ? fmtDate(c.fecha) : '—'}</div>
-        <div class="commit-meta">${c.proximaFecha ? 'Próxima: '+fmtDate(c.proximaFecha) : ''}</div>
-      </div>
-      <div style="display:flex;gap:6px;">
-        <button class="btn btn-sm btn-ghost" onclick="openCommitForm('conversacion','${c.id}')">✏</button>
-        <button class="btn btn-sm btn-danger" onclick="deleteCommit('conversaciones','${c.id}')">✕</button>
-      </div>
-    </div>
-    ${c.resumen ? `<div class="commit-body"><b>Resumen:</b> ${c.resumen}</div>` : ''}
-    ${c.acuerdos ? `<div class="commit-body"><b>Acuerdos:</b> ${c.acuerdos}</div>` : ''}
-  </div>`;
-}
-
-function renderCapacitacion(c) {
-  return `<div class="commit-item">
-    <div class="commit-header">
-      <div>
-        <div class="commit-title">${c.nombre}</div>
-        <div class="commit-meta">${c.institucion||''} · ${c.horas ? c.horas+' hrs' : ''}</div>
-      </div>
-      <div style="display:flex;gap:6px;align-items:center">
-        <span class="status-chip status-${slugify(c.estado)}">${c.estado}</span>
-        <button class="btn btn-sm btn-ghost" onclick="openCommitForm('capacitacion','${c.id}')">✏</button>
-        <button class="btn btn-sm btn-danger" onclick="deleteCommit('capacitaciones','${c.id}')">✕</button>
-      </div>
-    </div>
-    ${c.fechaInicio ? `<div class="commit-meta" style="margin-top:6px">${fmtDate(c.fechaInicio)} → ${c.fechaFin ? fmtDate(c.fechaFin) : 'en curso'}</div>` : ''}
-  </div>`;
-}
-
-function renderReconocimiento(r) {
-  const colors = { 'Reconocimiento': 'success', 'Llamado de atención': 'pendiente', 'Sanción': 'cancelado', 'Hito': 'en-curso' };
-  const cls = colors[r.tipo] || 'info';
-  return `<div class="commit-item">
-    <div class="commit-header">
-      <div>
-        <div class="commit-title">${r.tipo} · ${r.fecha ? fmtDate(r.fecha) : '—'}</div>
-        <div class="commit-meta">${r.registradoPor ? 'Registrado por: '+r.registradoPor : ''}</div>
-      </div>
-      <div style="display:flex;gap:6px;">
-        <button class="btn btn-sm btn-ghost" onclick="openCommitForm('reconocimiento','${r.id}')">✏</button>
-        <button class="btn btn-sm btn-danger" onclick="deleteCommit('reconocimientos','${r.id}')">✕</button>
-      </div>
-    </div>
-    ${r.descripcion ? `<div class="commit-body">${r.descripcion}</div>` : ''}
-  </div>`;
-}
-
-// ── TABS ──────────────────────────────────────────────────────────────────────
-function showTab(name, btn) {
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-  btn.classList.add('active');
-  document.getElementById('tab-'+name).classList.add('active');
-}
-
-// ── TEAM FORM ─────────────────────────────────────────────────────────────────
-function openTeamForm(edit) {
-  const t = edit ? db.teams.find(t => t.id === currentTeamId) : null;
-  document.getElementById('team-form-title').textContent = t ? 'Editar Equipo' : 'Nuevo Equipo';
-  document.getElementById('team-id').value = t ? t.id : '';
-  document.getElementById('team-name').value = t ? t.name : '';
-  document.getElementById('team-color').value = t ? t.color : '#3b9eff';
-  document.getElementById('team-desc').value = t ? t.desc : '';
-
-  const leadSel = document.getElementById('team-lead');
-  const leadHint = document.getElementById('team-lead-hint');
-  const members = t ? db.employees.filter(e => e.teamId === t.id) : [];
-  leadSel.innerHTML = '<option value="">— Sin líder —</option>';
-  if (!t || members.length === 0) {
-    leadSel.disabled = true;
-    leadHint.style.display = 'block';
-  } else {
-    leadSel.disabled = false;
-    leadHint.style.display = 'none';
-    members.forEach(m => {
-      const opt = document.createElement('option');
-      opt.value = m.id;
-      opt.textContent = `${m.nombre} ${m.apellido}${m.cargo?' · '+m.cargo:''}`;
-      if (t.leadId === m.id) opt.selected = true;
-      leadSel.appendChild(opt);
-    });
-  }
-  openModal('modal-team');
-}
-
-function editCurrentTeam() { openTeamForm(true); }
-
-function saveTeam() {
-  const id = document.getElementById('team-id').value;
-  const name = document.getElementById('team-name').value.trim();
-  if (!name) { toast('El nombre es obligatorio'); return; }
-  const data = {
-    name, color: document.getElementById('team-color').value,
-    leadId: document.getElementById('team-lead').value,
-    desc: document.getElementById('team-desc').value.trim()
-  };
-  if (id) { Object.assign(db.teams.find(t => t.id === id), data); }
-  else { db.teams.push({ id: uid(), ...data }); }
-  save(db); closeModal('modal-team'); renderHome(); renderEquiposPanels(); toast('Equipo guardado');
-}
-
-// ── EMPLOYEE FORM ─────────────────────────────────────────────────────────────
-function openEmployeeForm(edit) {
-  const e = edit ? db.employees.find(e => e.id === currentEmpId) : null;
-  document.getElementById('emp-form-title').textContent = e ? 'Editar Persona' : 'Nueva Persona';
-  const fields = {
-    'emp-id': e?.id||'', 'emp-nombre': e?.nombre||'', 'emp-apellido': e?.apellido||'',
-    'emp-rut': e?.rut||'', 'emp-nacimiento': e?.nacimiento||'',
-    'emp-email': e?.email||'', 'emp-tel': e?.tel||'',
-    'emp-estadocivil': e?.estadoCivil||'', 'emp-hijos': e?.hijos??'',
-    'emp-emerg-nombre': e?.emergNombre||'', 'emp-emerg-tel': e?.emergTel||'',
-    'emp-educacion': e?.educacion||'', 'emp-titulo': e?.titulo||'',
-    'emp-cert': e?.cert||'', 'emp-idiomas': e?.idiomas||'',
-    'emp-cargo': e?.cargo||'', 'emp-ingreso': e?.ingreso||'',
-    'emp-contrato': e?.contrato||'', 'emp-ceco': e?.ceco||'', 'emp-jornada': e?.jornada||''
-  };
-  Object.entries(fields).forEach(([id,val]) => { const el=document.getElementById(id); if(el) el.value=val; });
-  openModal('modal-employee');
-}
-
-function saveEmployee() {
-  const id = document.getElementById('emp-id').value;
-  const nombre = document.getElementById('emp-nombre').value.trim();
-  const apellido = document.getElementById('emp-apellido').value.trim();
-  if (!nombre || !apellido) { toast('Nombre y apellido son obligatorios'); return; }
-  const data = {
-    nombre, apellido,
-    rut: document.getElementById('emp-rut').value.trim(),
-    nacimiento: document.getElementById('emp-nacimiento').value,
-    email: document.getElementById('emp-email').value.trim(),
-    tel: document.getElementById('emp-tel').value.trim(),
-    estadoCivil: document.getElementById('emp-estadocivil').value,
-    hijos: document.getElementById('emp-hijos').value,
-    emergNombre: document.getElementById('emp-emerg-nombre').value.trim(),
-    emergTel: document.getElementById('emp-emerg-tel').value.trim(),
-    educacion: document.getElementById('emp-educacion').value,
-    titulo: document.getElementById('emp-titulo').value.trim(),
-    cert: document.getElementById('emp-cert').value.trim(),
-    idiomas: document.getElementById('emp-idiomas').value.trim(),
-    cargo: document.getElementById('emp-cargo').value.trim(),
-    ingreso: document.getElementById('emp-ingreso').value,
-    contrato: document.getElementById('emp-contrato').value,
-    ceco: document.getElementById('emp-ceco').value.trim(),
-    jornada: document.getElementById('emp-jornada').value,
-  };
-  if (id) {
-    const emp = db.employees.find(e => e.id === id);
-    Object.assign(emp, data);
-  } else {
-    db.employees.push({ id: uid(), teamId: currentTeamId, objetivos:[], conversaciones:[], capacitaciones:[], reconocimientos:[], ...data });
-  }
-  save(db); closeModal('modal-employee');
-  renderTeam();
-  renderEquiposPanels();
-  if (id) renderEmployee();
-  toast('Persona guardada');
-}
-
-function deleteEmployee(eid) {
-  if (!confirm('¿Eliminar esta persona y todos sus registros?')) return;
-  db.employees = db.employees.filter(e => e.id !== eid);
-  db.teams.forEach(t => { if (t.leadId === eid) t.leadId = ''; });
-  save(db); backToTeam(); toast('Persona eliminada');
-}
-
-// ── COMMITMENT FORMS ──────────────────────────────────────────────────────────
-function openCommitForm(type, editId) {
-  currentCommitType = type;
-  editingCommitId = editId || null;
-  const titles = { objetivo:'Objetivo', conversacion:'Conversación 1:1', capacitacion:'Capacitación', reconocimiento:'Reconocimiento / Sanción' };
-  document.getElementById('commit-form-title').textContent = (editId ? 'Editar ' : 'Nuevo ') + titles[type];
-  document.getElementById('commit-form-body').innerHTML = getCommitFormHTML(type, editId);
-  openModal('modal-commit');
-}
-
-function getCommitFormHTML(type, editId) {
-  const e = db.employees.find(e => e.id === currentEmpId);
-  let item = null;
-  const key = { objetivo:'objetivos', conversacion:'conversaciones', capacitacion:'capacitaciones', reconocimiento:'reconocimientos' }[type];
-  if (editId && e) item = (e[key]||[]).find(x => x.id === editId);
-
-  const v = (f, def='') => item ? (item[f]??def) : def;
-
-  if (type === 'objetivo') return `
-    <div class="field"><label>Título del objetivo</label><input type="text" id="cf-titulo" value="${v('titulo')}" placeholder="Ej: Certificar en AWS antes de junio"/></div>
-    <div class="field"><label>Descripción</label><textarea id="cf-desc">${v('descripcion')}</textarea></div>
-    <div class="grid-2">
-      <div class="field"><label>Fecha límite</label><input type="date" id="cf-fecha" value="${v('fechaLimite')}"/></div>
-      <div class="field"><label>Estado</label>
-        <select id="cf-estado">
-          ${['Pendiente','En curso','Completado','Cancelado'].map(s=>`<option ${v('estado')===s?'selected':''}>${s}</option>`).join('')}
-        </select>
-      </div>
-    </div>
-    <div class="field"><label>Avance (${v('progreso',0)}%)</label><input type="range" id="cf-prog" min="0" max="100" value="${v('progreso',0)}" oninput="this.previousElementSibling.textContent='Avance ('+this.value+'%)'"/></div>
-    <div style="display:flex;gap:8px;margin-top:16px;">
-      <button class="btn btn-primary btn-full" onclick="saveCommit()">Guardar</button>
-      <button class="btn btn-ghost" onclick="closeModal('modal-commit')">Cancelar</button>
-    </div>`;
-
-  if (type === 'conversacion') return `
-    <div class="grid-2">
-      <div class="field"><label>Fecha</label><input type="date" id="cf-fecha" value="${v('fecha')}"/></div>
-      <div class="field"><label>Tipo</label>
-        <select id="cf-tipo">
-          ${['Check-in','Feedback','Desarrollo','Seguimiento','Otro'].map(s=>`<option ${v('tipo')===s?'selected':''}>${s}</option>`).join('')}
-        </select>
-      </div>
-    </div>
-    <div class="field"><label>Resumen de la conversación</label><textarea id="cf-resumen">${v('resumen')}</textarea></div>
-    <div class="field"><label>Acuerdos / Compromisos</label><textarea id="cf-acuerdos">${v('acuerdos')}</textarea></div>
-    <div class="field"><label>Próxima reunión (opcional)</label><input type="date" id="cf-proxima" value="${v('proximaFecha')}"/></div>
-    <div style="display:flex;gap:8px;margin-top:16px;">
-      <button class="btn btn-primary btn-full" onclick="saveCommit()">Guardar</button>
-      <button class="btn btn-ghost" onclick="closeModal('modal-commit')">Cancelar</button>
-    </div>`;
-
-  if (type === 'capacitacion') return `
-    <div class="field"><label>Nombre de la capacitación</label><input type="text" id="cf-nombre" value="${v('nombre')}" placeholder="Ej: Excel Avanzado"/></div>
-    <div class="field"><label>Institución</label><input type="text" id="cf-inst" value="${v('institucion')}" placeholder="Ej: Udemy, Inacap…"/></div>
-    <div class="grid-2">
-      <div class="field"><label>Fecha inicio</label><input type="date" id="cf-inicio" value="${v('fechaInicio')}"/></div>
-      <div class="field"><label>Fecha término</label><input type="date" id="cf-fin" value="${v('fechaFin')}"/></div>
-    </div>
-    <div class="grid-2">
-      <div class="field"><label>Horas</label><input type="number" id="cf-horas" value="${v('horas')}" min="0" placeholder="40"/></div>
-      <div class="field"><label>Estado</label>
-        <select id="cf-estado">
-          ${['Pendiente','En curso','Completado','Cancelado'].map(s=>`<option ${v('estado')===s?'selected':''}>${s}</option>`).join('')}
-        </select>
-      </div>
-    </div>
-    <div style="display:flex;gap:8px;margin-top:16px;">
-      <button class="btn btn-primary btn-full" onclick="saveCommit()">Guardar</button>
-      <button class="btn btn-ghost" onclick="closeModal('modal-commit')">Cancelar</button>
-    </div>`;
-
-  if (type === 'reconocimiento') return `
-    <div class="grid-2">
-      <div class="field"><label>Tipo</label>
-        <select id="cf-tipo">
-          ${['Reconocimiento','Hito','Llamado de atención','Sanción'].map(s=>`<option ${v('tipo')===s?'selected':''}>${s}</option>`).join('')}
-        </select>
-      </div>
-      <div class="field"><label>Fecha</label><input type="date" id="cf-fecha" value="${v('fecha')}"/></div>
-    </div>
-    <div class="field"><label>Descripción</label><textarea id="cf-desc">${v('descripcion')}</textarea></div>
-    <div class="field"><label>Registrado por</label><input type="text" id="cf-reg" value="${v('registradoPor')}" placeholder="Tu nombre o cargo"/></div>
-    <div style="display:flex;gap:8px;margin-top:16px;">
-      <button class="btn btn-primary btn-full" onclick="saveCommit()">Guardar</button>
-      <button class="btn btn-ghost" onclick="closeModal('modal-commit')">Cancelar</button>
-    </div>`;
-}
-
-function saveCommit() {
-  const e = db.employees.find(e => e.id === currentEmpId);
-  if (!e) return;
-  const type = currentCommitType;
-  const key = { objetivo:'objetivos', conversacion:'conversaciones', capacitacion:'capacitaciones', reconocimiento:'reconocimientos' }[type];
-
-  const g = id => { const el=document.getElementById(id); return el ? el.value : ''; };
-
-  let data;
-  if (type === 'objetivo') data = { titulo:g('cf-titulo').trim(), descripcion:g('cf-desc').trim(), fechaLimite:g('cf-fecha'), estado:g('cf-estado'), progreso:parseInt(g('cf-prog'))||0 };
-  else if (type === 'conversacion') data = { fecha:g('cf-fecha'), tipo:g('cf-tipo'), resumen:g('cf-resumen').trim(), acuerdos:g('cf-acuerdos').trim(), proximaFecha:g('cf-proxima') };
-  else if (type === 'capacitacion') data = { nombre:g('cf-nombre').trim(), institucion:g('cf-inst').trim(), fechaInicio:g('cf-inicio'), fechaFin:g('cf-fin'), horas:g('cf-horas'), estado:g('cf-estado') };
-  else if (type === 'reconocimiento') data = { tipo:g('cf-tipo'), fecha:g('cf-fecha'), descripcion:g('cf-desc').trim(), registradoPor:g('cf-reg').trim() };
-
-  if (!e[key]) e[key] = [];
-  if (editingCommitId) {
-    const idx = e[key].findIndex(x => x.id === editingCommitId);
-    if (idx >= 0) e[key][idx] = { id: editingCommitId, ...data };
-  } else {
-    e[key].push({ id: uid(), ...data });
-  }
-
-  save(db); closeModal('modal-commit'); renderEmployee(); toast('Guardado');
-}
-
-function deleteCommit(key, cid) {
-  if (!confirm('¿Eliminar este registro?')) return;
-  const e = db.employees.find(e => e.id === currentEmpId);
-  if (!e || !e[key]) return;
-  e[key] = e[key].filter(x => x.id !== cid);
-  save(db); renderEmployee(); toast('Eliminado');
-}
-
-// ── MODAL HELPERS ─────────────────────────────────────────────────────────────
-function openModal(id) { document.getElementById(id).classList.add('open'); }
-function closeModal(id) { document.getElementById(id).classList.remove('open'); }
-
-// click outside to close
-document.querySelectorAll('.modal-overlay').forEach(o => {
-  o.addEventListener('click', e => { if (e.target === o) o.classList.remove('open'); });
-});
-
-// ── NEWS FEED ─────────────────────────────────────────────────────────────────
-function daysUntilDate(month, day, today) {
-  const thisYear = new Date(today.getFullYear(), month, day);
-  let diff = Math.round((thisYear - today) / (1000*60*60*24));
-  if (diff < 0) {
-    const nextYear = new Date(today.getFullYear()+1, month, day);
-    diff = Math.round((nextYear - today) / (1000*60*60*24));
-  }
-  return diff;
-}
-
-function renderNews() {
-  const today = new Date();
-  today.setHours(0,0,0,0);
-  const todayStr = today.toISOString().split('T')[0];
-
-  const DAYS_AHEAD = 7;
-  const news = [];
-  const recs = [];
-
-  db.employees.forEach(emp => {
-    const name = `${emp.nombre} ${emp.apellido}`;
-    const team = db.teams.find(t => t.id === emp.teamId);
-    const teamName = team ? team.name : '';
-
-    // 🎂 Cumpleaños
-    if (emp.nacimiento) {
-      const born = new Date(emp.nacimiento + 'T00:00:00');
-      const age = today.getFullYear() - born.getFullYear();
-      const d = daysUntilDate(born.getMonth(), born.getDate(), today);
-      if (d === 0)
-        news.push({ p:1, color:'success', icon:'🎂', title:`¡Hoy es el cumpleaños de ${name}!`, desc:`Cumple ${age} años · ${teamName}` });
-      else if (d <= DAYS_AHEAD)
-        news.push({ p:3, color:'info', icon:'🎂', title:`Cumpleaños próximo: ${name}`, desc:`En ${d} día${d>1?'s':''} cumple ${age} años · ${teamName}` });
-    }
-
-    // 🏆 Aniversario laboral
-    if (emp.ingreso) {
-      const start = new Date(emp.ingreso + 'T00:00:00');
-      const years = today.getFullYear() - start.getFullYear();
-      if (years > 0) {
-        const d = daysUntilDate(start.getMonth(), start.getDate(), today);
-        if (d === 0)
-          news.push({ p:1, color:'success', icon:'🏆', title:`¡Aniversario laboral de ${name}!`, desc:`Hoy cumple ${years} año${years>1?'s':''} en AquaChile · ${teamName}` });
-        else if (d <= DAYS_AHEAD)
-          news.push({ p:3, color:'info', icon:'🏆', title:`Aniversario próximo: ${name}`, desc:`En ${d} día${d>1?'s':''} cumple ${years} año${years>1?'s':''} en la empresa · ${teamName}` });
-      }
-    }
-
-    // 📅 Conversación 1:1 programada para hoy
-    (emp.conversaciones||[]).forEach(c => {
-      if (c.proximaFecha === todayStr)
-        news.push({ p:1, color:'warning', icon:'📅', title:`Conversación 1:1 programada hoy con ${name}`, desc:`Tipo: ${c.tipo||'1:1'} · ${teamName}` });
-    });
-
-    // ⚠️ Objetivos vencidos o por vencer
-    (emp.objetivos||[]).forEach(obj => {
-      if (!obj.fechaLimite || obj.estado === 'Completado' || obj.estado === 'Cancelado') return;
-      const due = new Date(obj.fechaLimite + 'T00:00:00');
-      const diff = Math.round((due - today) / (1000*60*60*24));
-      if (diff < 0)
-        news.push({ p:1, color:'danger', icon:'⚠️', title:`Objetivo vencido: ${name}`, desc:`"${obj.titulo}" · venció hace ${Math.abs(diff)} día${Math.abs(diff)>1?'s':''}` });
-      else if (diff === 0)
-        news.push({ p:1, color:'warning', icon:'📋', title:`Objetivo vence hoy: ${name}`, desc:`"${obj.titulo}"` });
-      else if (diff <= DAYS_AHEAD)
-        news.push({ p:2, color:'warning', icon:'📋', title:`Objetivo por vencer: ${name}`, desc:`"${obj.titulo}" · vence en ${diff} días` });
-    });
-
-    // 📚 Capacitaciones por terminar
-    (emp.capacitaciones||[]).forEach(cap => {
-      if (!cap.fechaFin || cap.estado === 'Completado' || cap.estado === 'Cancelado') return;
-      const due = new Date(cap.fechaFin + 'T00:00:00');
-      const diff = Math.round((due - today) / (1000*60*60*24));
-      if (diff === 0)
-        news.push({ p:2, color:'info', icon:'📚', title:`Capacitación finaliza hoy: ${name}`, desc:`"${cap.nombre}"` });
-      else if (diff < 0 && cap.estado === 'En curso')
-        news.push({ p:2, color:'warning', icon:'📚', title:`Capacitación vencida: ${name}`, desc:`"${cap.nombre}" debería haber terminado hace ${Math.abs(diff)} días` });
-    });
-
-    // 💬 Recomendación de reunión
-    const convs = emp.conversaciones || [];
-    if (convs.length === 0) {
-      recs.push({ p:5, color:'info', icon:'💬', title:`Recomendación: agenda una 1:1 con ${name}`, desc:`Sin conversaciones registradas · ${teamName}` });
-    } else {
-      const last = convs.filter(c=>c.fecha).sort((a,b)=>b.fecha.localeCompare(a.fecha))[0];
-      if (last) {
-        const lastDate = new Date(last.fecha + 'T00:00:00');
-        const daysSince = Math.round((today - lastDate) / (1000*60*60*24));
-        if (daysSince >= 30)
-          recs.push({ p:4, color:'info', icon:'💬', title:`Recomendación: reunirse con ${name}`, desc:`Hace ${daysSince} días sin conversación registrada · ${teamName}` });
-      }
-    }
-  });
-
-  // Añadir máx. 3 recomendaciones ordenadas por días sin conversación
-  recs.slice(0, 3).forEach(r => news.push(r));
-  news.sort((a,b) => a.p - b.p);
-
-  const dias = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
-  const meses = ['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
-  document.getElementById('news-date').textContent =
-    `${dias[today.getDay()]} ${today.getDate()} de ${meses[today.getMonth()]} de ${today.getFullYear()}`;
-
-  const container = document.getElementById('news-container');
-  if (!news.length) {
-    container.innerHTML = `<div class="news-empty">✓ Sin eventos relevantes para hoy. ¡Buen día!</div>`;
-    return;
-  }
-  container.innerHTML = news.slice(0,12).map(n => `
-    <div class="news-item news-${n.color}">
-      <span class="news-icon">${n.icon}</span>
-      <div class="news-content">
-        <div class="news-title">${n.title}</div>
-        <div class="news-desc">${n.desc}</div>
-      </div>
-    </div>`).join('');
-}
-
-// ── ATTENDANCE & PLANNER ─────────────────────────────────────────────────────
-const HOLIDAYS = {
-  '2026-01-01':'Año Nuevo',
-  '2026-04-03':'Viernes Santo',
-  '2026-04-04':'Sábado Santo',
-  '2026-05-01':'Día del Trabajo',
-  '2026-05-21':'Glorias Navales',
-  '2026-06-29':'San Pedro y San Pablo',
-  '2026-07-16':'Virgen del Carmen',
-  '2026-08-15':'Asunción de la Virgen',
-  '2026-09-18':'Fiestas Patrias',
-  '2026-09-19':'Día del Ejército',
-  '2026-10-12':'Día de la Raza',
-  '2026-11-01':'Todos los Santos',
-  '2026-12-08':'Inmaculada Concepción',
-  '2026-12-25':'Navidad',
-};
-
-function toDs(d) {
-  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-}
-function isWeekend(ds) { const w=new Date(ds+'T12:00:00').getDay(); return w===0||w===6; }
-function isHoliday(ds) { return !!HOLIDAYS[ds]; }
-function isWorkday(ds) { return !isWeekend(ds) && !isHoliday(ds); }
-
-let plannerWeek = getMondayOf(new Date());
-let plannerTeam = 'all';
-let pendingComp = null;
-
-function getMondayOf(d) {
-  const r = new Date(d); r.setHours(0,0,0,0);
-  const w = r.getDay(); r.setDate(r.getDate() - (w===0?6:w-1));
-  return r;
-}
-
-function weekDates(monday) {
-  return Array.from({length:7}, (_,i) => { const d=new Date(monday); d.setDate(d.getDate()+i); return toDs(d); });
-}
-
-function changeWeek(dir) {
-  plannerWeek = new Date(plannerWeek);
-  plannerWeek.setDate(plannerWeek.getDate() + dir*7);
-  renderPlanner();
-}
-
-function renderPlanner() {
-  const user = getCurrentUser();
-  const isLeader = user && user.type === 'leader';
-
-  // User badge
-  const badge = document.getElementById('planner-user-badge');
-  if (user) {
-    badge.innerHTML = `<div class="user-badge">
-      ${isLeader?'👥':'⭐'} Ingresando como <strong>${user.name}</strong>
-      ${isLeader?`<span style="color:${db.teams.find(t=>t.id===user.teamId)?.color||'var(--accent)'}"> · ${db.teams.find(t=>t.id===user.teamId)?.name||''}</span>`:''}
-      <button onclick="doLogout()" title="Salir">Salir</button>
-    </div>`;
-  } else { badge.innerHTML = ''; }
-
-  // Enforce team for leaders
-  if (isLeader) plannerTeam = user.teamId;
-
-  const dates = weekDates(plannerWeek);
-  const DNAMES = ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
-  const MONTHS = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
-  const d0 = new Date(dates[0]+'T12:00:00'), d6 = new Date(dates[6]+'T12:00:00');
-  document.getElementById('week-label').textContent =
-    `${d0.getDate()} ${MONTHS[d0.getMonth()]} – ${d6.getDate()} ${MONTHS[d6.getMonth()]} ${d6.getFullYear()}`;
-
-  const hdaysThisWeek = dates.filter(d => HOLIDAYS[d]);
-  document.getElementById('holiday-alert').innerHTML = hdaysThisWeek.map(d =>
-    `<div class="alert alert-warn" style="margin-bottom:6px">🎌 <b>${HOLIDAYS[d]}</b> — ${fmtDate(d)}</div>`).join('');
-
-  // Team tabs: only for manager
-  const tabsEl = document.getElementById('planner-tabs');
-  if (isLeader) {
-    tabsEl.innerHTML = '';
-  } else {
-    tabsEl.innerHTML =
-      `<div class="team-tab${plannerTeam==='all'?' active':''}" onclick="setPlannerTeam('all')">Todos los equipos</div>` +
-      db.teams.map(t => `<div class="team-tab${plannerTeam===t.id?' active':''}" onclick="setPlannerTeam('${t.id}')"
-        style="${plannerTeam===t.id?`border-color:${t.color};color:${t.color}`:''}">
-        ${t.name}</div>`).join('');
-  }
-
-  const emps = plannerTeam==='all' ? [...db.employees] : db.employees.filter(e=>e.teamId===plannerTeam);
-  const readonly = user && user.type === 'manager';
-  // Sort by team then name
-  emps.sort((a,b)=>(a.teamId+a.apellido).localeCompare(b.teamId+b.apellido));
-
-  if (!emps.length) {
-    document.getElementById('planner-table').innerHTML =
-      '<tr><td style="text-align:center;padding:32px;color:var(--text-muted)">Sin personas para mostrar</td></tr>';
-    return;
-  }
-
-  const thead = `<thead><tr>
-    <th class="col-name">Persona</th>
-    ${dates.map((d,i) => {
-      const hw = HOLIDAYS[d]; const we = isWeekend(d);
-      return `<th class="${hw?'col-holiday':we?'col-weekend':''}">${DNAMES[i]}<br>
-        <span style="font-weight:400;font-size:.78em">${d.split('-')[2]}</span>
-        ${hw?`<br><span style="font-size:.6em;font-weight:400">${hw.split(' ').slice(0,2).join(' ')}</span>`:''}
-      </th>`;
-    }).join('')}
-  </tr></thead>`;
-
-  const tbody = emps.map(e => {
-    const team = db.teams.find(t=>t.id===e.teamId);
-    const cells = dates.map(d => {
-      const wd = isWorkday(d); const we = isWeekend(d); const hd = !!HOLIDAYS[d];
-      const sT = getAtt(e.id,d,'teletrabajo');
-      const sV = getAtt(e.id,d,'vacaciones');
-      const sC = getAtt(e.id,d,'compensado');
-      // Teletrabajo restriction check
-      const dow = new Date(d+'T12:00:00').getDay();
-      const limit = dow===5 ? 1 : 2;
-      const teamTele = (db.attendance||[]).filter(a=>a.type==='teletrabajo'&&a.date===d&&a.teamId===e.teamId&&a.empId!==e.id).length;
-      const tBlocked = !wd || (!!sV||!!sC) || (!sT && teamTele>=limit);
-      const vCanSet = !we; // vacaciones allowed on holidays too (legally counted)
-      const cBlocked = !wd || !!sV;
-      const bg = (we||hd)?'background:var(--surface3)':'';
-      const canEdit = !readonly;
-      const clickT = canEdit ? `onclick="toggleAtt('${e.id}','${d}','teletrabajo')"` : '';
-      const clickV = canEdit ? `onclick="toggleAtt('${e.id}','${d}','vacaciones')"` : '';
-      const clickC = canEdit ? `onclick="toggleAtt('${e.id}','${d}','compensado')"` : '';
-      return `<td style="${bg}${readonly?' opacity:.85':''}">
-        <div class="day-btns">
-          <button class="day-btn${sT?' on-T':''}" ${(tBlocked&&!sT)||readonly?'disabled':''}
-            ${clickT} title="Teletrabajo${teamTele>=limit&&!sT?' (límite alcanzado)':''}">T</button>
-          <button class="day-btn${sV?' on-V':''}" ${(!vCanSet&&!sV)||readonly?'disabled':''}
-            ${clickV} title="Vacaciones">V</button>
-          <button class="day-btn${sC?' on-C':''}" ${(cBlocked&&!sC)||readonly?'disabled':''}
-            ${clickC} title="Compensado">C</button>
-        </div>
-        ${sC&&sC.motivo?`<div style="font-size:.58rem;color:var(--warning);text-align:center;margin-top:2px;line-height:1.2">${sC.motivo.slice(0,18)}${sC.motivo.length>18?'…':''}</div>`:''}
-      </td>`;
-    }).join('');
-    return `<tr>
-      <td class="col-name">
-        <div class="p-name">${e.nombre} ${e.apellido}</div>
-        <div class="p-role">${e.cargo||''}${team?` · <span style="color:${team.color}">${team.name}</span>`:''}</div>
-      </td>${cells}
-    </tr>`;
-  }).join('');
-
-  document.getElementById('planner-table').innerHTML = thead + `<tbody>${tbody}</tbody>`;
-}
-
-function setPlannerTeam(id) { plannerTeam = id; renderPlanner(); }
-
-function getAtt(empId, date, type) {
-  return (db.attendance||[]).find(a=>a.empId===empId&&a.date===date&&a.type===type)||null;
-}
-
-function toggleAtt(empId, date, type) {
-  if (!db.attendance) db.attendance = [];
-  const existing = getAtt(empId, date, type);
-
-  if (type === 'compensado') {
-    if (existing) {
-      db.attendance = db.attendance.filter(a=>!(a.empId===empId&&a.date===date&&a.type===type));
-      save(db); renderPlanner(); return;
-    }
-    pendingComp = { empId, date };
-    document.getElementById('comp-motivo').value = '';
-    const emp = db.employees.find(e=>e.id===empId);
-    document.getElementById('comp-modal-title').textContent =
-      `Compensado · ${emp?emp.nombre+' '+emp.apellido:''} · ${fmtDate(date)}`;
-    openModal('modal-compensado'); return;
-  }
-
-  if (existing) {
-    db.attendance = db.attendance.filter(a=>!(a.empId===empId&&a.date===date&&a.type===type));
-  } else {
-    // Validate teletrabajo restriction
-    if (type === 'teletrabajo') {
-      const emp = db.employees.find(e=>e.id===empId);
-      const dow = new Date(date+'T12:00:00').getDay();
-      const limit = dow===5 ? 1 : 2;
-      const count = db.attendance.filter(a=>a.type==='teletrabajo'&&a.date===date&&a.teamId===emp.teamId&&a.empId!==empId).length;
-      if (count >= limit) {
-        toast(`⚠️ ${dow===5?'Viernes: máx. 1':'Máx. 2'} personas de ${db.teams.find(t=>t.id===emp.teamId)?.name||'este equipo'} en teletrabajo`);
-        return;
-      }
-    }
-    // Mutually exclusive: remove other types
-    db.attendance = db.attendance.filter(a=>!(a.empId===empId&&a.date===date));
-    const emp = db.employees.find(e=>e.id===empId);
-    db.attendance.push({ id:uid(), empId, teamId:emp.teamId, date, type, motivo:'' });
-  }
-  save(db); renderPlanner();
-}
-
-function saveCompensado() {
-  const motivo = document.getElementById('comp-motivo').value.trim();
-  if (!motivo) { toast('Escribe el motivo del día compensado'); return; }
-  const { empId, date } = pendingComp;
-  db.attendance = db.attendance.filter(a=>!(a.empId===empId&&a.date===date));
-  const emp = db.employees.find(e=>e.id===empId);
-  db.attendance.push({ id:uid(), empId, teamId:emp.teamId, date, type:'compensado', motivo });
-  save(db); closeModal('modal-compensado'); pendingComp = null;
-  renderPlanner(); toast('Día compensado guardado');
-}
-
-function cancelCompensado() {
-  pendingComp = null;
-  closeModal('modal-compensado');
-}
-
-// ── CALENDAR ──────────────────────────────────────────────────────────────────
-let calYear = new Date().getFullYear();
-let calMonth = new Date().getMonth();
-let calViewMode = 'full'; // 'full' | 'work'
-
-function setCalView(mode) {
-  calViewMode = mode;
-  document.getElementById('cal-btn-full').className = 'btn btn-sm ' + (mode==='full'?'btn-primary':'btn-ghost');
-  document.getElementById('cal-btn-work').className = 'btn btn-sm ' + (mode==='work'?'btn-primary':'btn-ghost');
-  renderCalendar();
-}
-
-function changeMonth(dir) {
-  calMonth += dir;
-  if (calMonth>11){calMonth=0;calYear++;}
-  if (calMonth<0){calMonth=11;calYear--;}
-  renderCalendar();
-}
-
-function renderCalendar() {
-  const MNAMES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
-  const isWork = calViewMode === 'work';
-  const DNAMES = isWork ? ['Lun','Mar','Mié','Jue','Vie'] : ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
-  const cols = isWork ? 5 : 7;
-  document.getElementById('cal-month-label').textContent = `${MNAMES[calMonth]} ${calYear}`;
-  document.getElementById('cal-header').style.gridTemplateColumns = `repeat(${cols},1fr)`;
-  document.getElementById('cal-grid').style.gridTemplateColumns = `repeat(${cols},1fr)`;
-  document.getElementById('cal-header').innerHTML = DNAMES.map(d=>`<div class="cal-header-cell">${d}</div>`).join('');
-
-  const today = new Date(); today.setHours(0,0,0,0);
-  const todayDs = toDs(today);
-  const firstDow = new Date(calYear,calMonth,1).getDay();
-  const startOffset = firstDow===0 ? 6 : firstDow-1; // Mon=0
-  const daysInMonth = new Date(calYear,calMonth+1,0).getDate();
-  const prevM = calMonth===0?11:calMonth-1, prevY = calMonth===0?calYear-1:calYear;
-  const dInPrev = new Date(prevY,prevM+1,0).getDate();
-  const nextM = calMonth===11?0:calMonth+1, nextY = calMonth===11?calYear+1:calYear;
-
-  // Build full 7-col grid, then filter to 5 if work mode
-  const full = [];
-  for (let i=startOffset-1;i>=0;i--) full.push({ ds:toDs(new Date(prevY,prevM,dInPrev-i)), other:true });
-  for (let d=1;d<=daysInMonth;d++) full.push({ ds:toDs(new Date(calYear,calMonth,d)), other:false });
-  let nd=1; while(full.length<42) full.push({ ds:toDs(new Date(nextY,nextM,nd++)), other:true });
-
-  const cells = isWork ? full.filter((_,i) => i%7 < 5) : full;
-
-  document.getElementById('cal-grid').innerHTML = cells.map(({ds,other})=>{
-    const d = new Date(ds+'T12:00:00');
-    const we = d.getDay()===0||d.getDay()===6;
-    const hw = HOLIDAYS[ds];
-    const isT = ds===todayDs;
-    let cls='cal-day';
-    if(other) cls+=' other-month';
-    else { if(we) cls+=' weekend'; if(hw) cls+=' holiday'; if(isT) cls+=' today'; }
-    const att = (db.attendance||[]).filter(a=>a.date===ds);
-    const tele=att.filter(a=>a.type==='teletrabajo');
-    const vac=att.filter(a=>a.type==='vacaciones');
-    const comp=att.filter(a=>a.type==='compensado');
-    return `<div class="${cls}" onclick="showDayDetail('${ds}')">
-      <div class="cal-num">${d.getDate()}</div>
-      ${hw?`<div class="cal-hday">${hw}</div>`:''}
-      <div class="cal-chips">
-        ${tele.length?`<div class="cal-chip cal-chip-T">💻 ${tele.length} teletrabajo</div>`:''}
-        ${vac.length?`<div class="cal-chip cal-chip-V">🌴 ${vac.length} vacaciones</div>`:''}
-        ${comp.length?`<div class="cal-chip cal-chip-C">📅 ${comp.length} compensado</div>`:''}
-      </div>
-    </div>`;
-  }).join('');
-}
-
-function showDayDetail(ds) {
-  if (!ds) return;
-  const hw = HOLIDAYS[ds];
-  const we = new Date(ds+'T12:00:00').getDay();
-  const weStr = we===0?'Domingo':we===6?'Sábado':'';
-  document.getElementById('day-modal-title').textContent =
-    `${fmtDate(ds)}${weStr?' · '+weStr:''}${hw?' · '+hw:''}`;
-  const att = (db.attendance||[]).filter(a=>a.date===ds);
-  const types = [
-    {key:'teletrabajo',label:'Teletrabajo',icon:'💻'},
-    {key:'vacaciones',label:'Vacaciones',icon:'🌴'},
-    {key:'compensado',label:'Días Compensados',icon:'📅'},
-  ];
-  let html='';
-  types.forEach(({key,label,icon})=>{
-    const items=att.filter(a=>a.type===key);
-    if(!items.length) return;
-    html+=`<div class="section-lbl" style="margin-top:${html?'16px':'0'}">${icon} ${label} (${items.length})</div>`;
-    html+=items.map(a=>{
-      const emp=db.employees.find(e=>e.id===a.empId);
-      const team=db.teams.find(t=>t.id===a.teamId);
-      return `<div style="display:flex;justify-content:space-between;align-items:flex-start;padding:8px 0;border-bottom:1px solid var(--border2)">
-        <div>
-          <div style="font-size:.88rem;font-weight:600;color:var(--text-bright)">${emp?emp.nombre+' '+emp.apellido:'—'}</div>
-          <div style="font-size:.75rem;color:var(--text-muted)">${emp?.cargo||''}${team?` · <span style="color:${team.color}">${team.name}</span>`:''}</div>
-          ${a.motivo?`<div style="font-size:.75rem;color:var(--warning);margin-top:2px">📝 ${a.motivo}</div>`:''}
-        </div>
-      </div>`;
-    }).join('');
-  });
-  if(!html) html='<div class="empty"><div class="empty-icon">📭</div><p>Sin registros para este día</p></div>';
-  document.getElementById('day-modal-body').innerHTML=html;
-  openModal('modal-day');
-}
-
-// ── UTILS ─────────────────────────────────────────────────────────────────────
-function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2,7); }
-
-function fmtDate(d) {
-  if (!d) return '—';
-  const [y,m,day] = d.split('-');
-  return `${day}/${m}/${y}`;
-}
-
-function calcAge(dateStr) {
-  const born = new Date(dateStr);
-  const now = new Date();
-  return Math.floor((now - born) / (365.25*24*60*60*1000));
-}
-
-function slugify(s) { return (s||'').toLowerCase().replace(/\s+/g,'-').replace(/[^a-z0-9-]/g,''); }
-
-function toast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.classList.add('show');
-  setTimeout(() => t.classList.remove('show'), 2200);
-}
-
-// ── LOGIN / SESSION ───────────────────────────────────────────────────────────
-const SESSION_KEY = 'eq_user_v1';
-
-function getCurrentUser() {
-  try {
-    const u = JSON.parse(sessionStorage.getItem(SESSION_KEY));
-    // Reject old session format that lacks modules
-    return (u && u.modules) ? u : null;
-  } catch(e) { return null; }
-}
-
-function doLogin(sessionUser) {
-  sessionStorage.setItem(SESSION_KEY, JSON.stringify(sessionUser));
-  updateNavVisibility(sessionUser);
-  const first = sessionUser.modules && sessionUser.modules[0] ? sessionUser.modules[0] : 'home';
-  showScreen(first); setNav('nav-' + first);
-}
-
-function doLogout() {
-  sessionStorage.removeItem(SESSION_KEY);
-  // Reset all nav buttons to default visible
-  ['nav-home','nav-equipos','nav-planner','nav-calendar'].forEach(id => {
-    const el = document.getElementById(id); if (el) el.style.display = '';
-  });
-  document.getElementById('nav-permisos').style.display = 'none';
-  document.getElementById('nav-emp').style.display = 'none';
-  showScreen('login');
-}
-
-function updateNavVisibility(user) {
-  const mods = user?.modules || [];
-  const map = { home:'nav-home', equipos:'nav-equipos', planner:'nav-planner', calendar:'nav-calendar', permisos:'nav-permisos' };
-  Object.entries(map).forEach(([mod, id]) => {
-    const el = document.getElementById(id);
-    if (el) el.style.display = mods.includes(mod) ? '' : 'none';
-  });
-  document.getElementById('nav-emp').style.display = 'none';
-}
-
-function attemptLogin() {
-  const email = (document.getElementById('login-email')?.value || '').trim().toLowerCase();
-  const pass = document.getElementById('login-pass')?.value || '';
-  const errEl = document.getElementById('login-err');
-  const card = document.getElementById('login-card');
-
-  if (!email || !pass) {
-    errEl.textContent = 'Ingresa tu correo y contraseña.';
-    errEl.style.display = 'block'; return;
-  }
-
-  const user = db.users.find(u => u.email.toLowerCase() === email && u.password === pass);
-  if (!user) {
-    errEl.textContent = 'Correo o contraseña incorrectos.';
-    errEl.style.display = 'block';
-    if (card) { card.style.animation = 'none'; requestAnimationFrame(() => { card.style.animation = 'shake .35s ease'; }); }
-    return;
-  }
-
-  doLogin({ type: user.role, name: user.name, empId: user.empId||null, teamId: user.teamId||null, modules: user.modules });
-}
-
-function clearLoginErr() {
-  const el = document.getElementById('login-err');
-  if (el) el.style.display = 'none';
-}
-
-function toggleLoginPass() {
-  const inp = document.getElementById('login-pass');
-  if (!inp) return;
-  inp.type = inp.type === 'password' ? 'text' : 'password';
-}
-
-// ── PERMISOS ──────────────────────────────────────────────────────────────────
-const ALL_MODULES = [
-  { id:'home', icon:'🏠', label:'Inicio' },
-  { id:'equipos', icon:'👥', label:'Equipos' },
-  { id:'planner', icon:'📋', label:'Semana' },
-  { id:'calendar', icon:'📅', label:'Gerencia' },
-  { id:'permisos', icon:'🔐', label:'Permisos' },
-];
-
-function renderPermisos() {
-  const list = document.getElementById('permisos-list');
-  if (!db.users.length) {
-    list.innerHTML = '<div class="empty"><div class="empty-icon">👤</div><p>Sin usuarios configurados</p></div>';
-    return;
-  }
-  list.innerHTML = db.users.map(u => {
-    const initials = u.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
-    const team = u.teamId ? db.teams.find(t => t.id === u.teamId) : null;
-    const mods = u.modules || [];
-    return `<div class="user-row">
-      <div class="avatar" style="width:44px;height:44px;font-size:.9rem;flex-shrink:0${u.role==='manager'?';background:linear-gradient(135deg,#b45309,#fbbf24)':''}">${initials}</div>
-      <div style="flex:1;min-width:0">
-        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:2px">
-          <span style="font-weight:700;color:var(--text-bright);font-size:.95rem">${u.name}</span>
-          <span class="urb ${u.role==='manager'?'urb-manager':'urb-leader'}">${u.role==='manager'?'Gerente':'Líder'}</span>
-          ${team ? `<span style="font-size:.72rem;font-weight:600;color:${team.color}">${team.name}</span>` : ''}
-        </div>
-        <div style="font-size:.78rem;color:var(--text-muted);margin-bottom:10px">${u.email}</div>
-        <div class="mod-pills">
-          ${ALL_MODULES.map(m => `<span class="mod-pill${mods.includes(m.id)?' on':''}" onclick="toggleUserMod('${u.id}','${m.id}')">${m.icon} ${m.label}</span>`).join('')}
-        </div>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0">
-        <button class="btn btn-sm btn-ghost" onclick="openUserForm('${u.id}')">✏ Editar</button>
-        ${u.id === 'u-admin' ? '' : `<button class="btn btn-sm btn-danger" onclick="deleteUser('${u.id}')">🗑</button>`}
-      </div>
-    </div>`;
-  }).join('');
-}
-
-function toggleUserMod(userId, mod) {
-  const u = db.users.find(x => x.id === userId);
-  if (!u) return;
-  const idx = u.modules.indexOf(mod);
-  if (idx >= 0) u.modules.splice(idx, 1);
-  else u.modules.push(mod);
-  save(db); renderPermisos(); toast('Permisos actualizados');
-}
-
-function openUserForm(userId) {
-  const u = userId ? db.users.find(x => x.id === userId) : null;
-  document.getElementById('user-form-title').textContent = u ? 'Editar Usuario' : 'Nuevo Usuario';
-  document.getElementById('uf-id').value = u?.id || '';
-  document.getElementById('uf-name').value = u?.name || '';
-  document.getElementById('uf-email').value = u?.email || '';
-  document.getElementById('uf-pass').value = '';
-  document.getElementById('uf-pass-hint').style.display = u ? '' : 'none';
-  document.getElementById('uf-role').value = u?.role || 'leader';
-  updateUfTeamWrap(u?.teamId);
-  const mods = u?.modules || ['home','equipos','planner'];
-  ALL_MODULES.forEach(m => {
-    const cb = document.getElementById('uf-mod-'+m.id);
-    if (cb) cb.checked = mods.includes(m.id);
-  });
-  openModal('modal-user');
-}
-
-function updateUfTeamWrap(selectedTid) {
-  const role = document.getElementById('uf-role').value;
-  const wrap = document.getElementById('uf-team-wrap');
-  wrap.style.display = role === 'leader' ? '' : 'none';
-  const sel = document.getElementById('uf-team');
-  sel.innerHTML = '<option value="">— Seleccionar —</option>' +
-    db.teams.map(t => `<option value="${t.id}"${t.id===selectedTid?' selected':''}>${t.name}</option>`).join('');
-}
-
-function saveUser() {
-  const id = document.getElementById('uf-id').value;
-  const name = document.getElementById('uf-name').value.trim();
-  const email = document.getElementById('uf-email').value.trim().toLowerCase();
-  const pass = document.getElementById('uf-pass').value;
-  const role = document.getElementById('uf-role').value;
-  const teamId = role === 'leader' ? (document.getElementById('uf-team').value || null) : null;
-
-  if (!name || !email) { toast('Nombre y correo son obligatorios'); return; }
-  if (!id && !pass) { toast('La contraseña es obligatoria para un nuevo usuario'); return; }
-
-  const dup = db.users.find(u => u.email.toLowerCase() === email && u.id !== id);
-  if (dup) { toast('Ese correo ya está registrado'); return; }
-
-  const mods = ALL_MODULES.map(m => m.id).filter(m => document.getElementById('uf-mod-'+m)?.checked);
-
-  if (id) {
-    const u = db.users.find(x => x.id === id);
-    u.name = name; u.email = email; u.role = role; u.teamId = teamId; u.modules = mods;
-    if (pass) u.password = pass;
-  } else {
-    db.users.push({ id: uid(), name, email, password: pass, role, teamId, empId: null, modules: mods });
-  }
-
-  save(db); closeModal('modal-user'); renderPermisos(); toast('Usuario guardado');
-}
-
-function deleteUser(userId) {
-  if (!confirm('¿Eliminar este usuario? No podrá acceder a la aplicación.')) return;
-  db.users = db.users.filter(u => u.id !== userId);
-  save(db); renderPermisos(); toast('Usuario eliminado');
-}
-
-function toggleUfPass() {
-  const inp = document.getElementById('uf-pass');
-  if (!inp) return;
-  inp.type = inp.type === 'password' ? 'text' : 'password';
-}
-
-// ── BOOT ──────────────────────────────────────────────────────────────────────
-(function boot() {
-  const user = getCurrentUser();
-  if (user) {
-    updateNavVisibility(user);
-    const first = user.modules && user.modules[0] ? user.modules[0] : 'home';
-    showScreen(first); setNav('nav-' + first);
-  } else {
-    document.querySelector('.nav-bar').style.display = 'none';
-  }
-})();
-</script>
 </body>
 </html>
