@@ -326,7 +326,7 @@ export default function Employee() {
   );
 }
 
-function EmpForm({ emp, onClose, onSaved }) {
+export function EmpForm({ emp, onClose, onSaved }) {
   const { db, setDb, toast } = useApp();
   const [d, setD] = useState({
     nombre: emp?.nombre || '', apellido: emp?.apellido || '', rut: emp?.rut || '',
@@ -348,7 +348,7 @@ function EmpForm({ emp, onClose, onSaved }) {
     setSaving(true);
     try {
       let updated;
-      if (emp) {
+      if (emp?._id) {
         updated = await api.updateEmployee(emp._id, d);
         setDb(prev => ({ ...prev, employees: prev.employees.map(e => e._id === emp._id ? updated : e) }));
       } else {

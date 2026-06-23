@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useApp } from '../context/AppContext.jsx';
 import { api } from '../api/index.js';
 import Modal from '../components/Modal.jsx';
+import { EmpForm } from './Employee.jsx';
 
 function TeamForm({ teamId, onClose, onSaved }) {
   const { db, setDb, toast } = useApp();
@@ -82,6 +83,7 @@ export default function Equipos() {
   const [pill, setPill]       = useState('all');
   const [filter, setFilter]   = useState('');
   const [teamModal, setTeamModal] = useState(null); // null | 'new' | teamId
+  const [empModal, setEmpModal]   = useState(null); // null | teamId (pre-selects team)
 
   const teamsToShow = pill === 'all' ? db.teams : db.teams.filter(t => t._id === pill);
   const today = new Date(); today.setHours(0, 0, 0, 0);
@@ -184,7 +186,7 @@ export default function Equipos() {
                 })
               }
               {canEdit && (
-                <button onClick={() => { /* add person to team */ }}
+                <button onClick={() => setEmpModal(t._id)}
                   className="rounded-xl p-3 text-sm font-semibold text-center transition-all"
                   style={{ border: `1px dashed var(--border2)`, color: 'var(--text-muted)', background: 'transparent' }}>
                   + Persona
@@ -205,6 +207,18 @@ export default function Equipos() {
             teamId={teamModal === 'new' ? null : teamModal}
             onClose={() => setTeamModal(null)}
             onSaved={() => setTeamModal(null)}
+          />
+        </Modal>
+      )}
+
+      {/* New employee modal */}
+      {empModal !== null && (
+        <Modal title="Nueva Persona" onClose={() => setEmpModal(null)} maxWidth="600px">
+          <EmpForm
+            emp={{ teamId: empModal }}
+            onClose={() => setEmpModal(null)}
+            onSaved={() => setEmpModal(null)}
+            isNew
           />
         </Modal>
       )}
