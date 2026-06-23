@@ -1,18 +1,15 @@
 import { defineConfig, loadEnv } from 'vite';
+import react from '@vitejs/plugin-react';
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
   return {
+    plugins: [react()],
     base: env.VITE_BASE || './',
-    build: {
-      outDir: 'dist',
-      assetsInlineLimit: 0,
-    },
+    build: { outDir: 'dist' },
     server: {
       port: 3000,
-      open: true,
       proxy: {
-        // In dev, /api requests are forwarded to the backend
         '/api': {
           target: env.VITE_API_URL || 'http://localhost:3001',
           changeOrigin: true,
