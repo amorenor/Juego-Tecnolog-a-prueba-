@@ -2,7 +2,7 @@ import { Router } from 'express';
 import jwt from 'jsonwebtoken';
 import rateLimit from 'express-rate-limit';
 import { body, validationResult } from 'express-validator';
-import User from '../models/User.js';
+import { User } from '../models/index.js';
 
 const router = Router();
 
@@ -41,7 +41,7 @@ router.post('/login', loginLimiter, loginValidation, async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    const user = await User.findOne({ email });
+    const user = await User.findOne({ where: { email } });
     if (!user) {
       console.warn(`[SEGURIDAD] Login fallido — correo no existe: ${email} — IP: ${req.ip}`);
       return res.status(401).json({ error: 'Credenciales incorrectas' });
@@ -84,7 +84,7 @@ router.get('/me', async (req, res) => {
   }
   try {
     const payload = jwt.verify(header.split(' ')[1], process.env.JWT_SECRET);
-    const user = await User.findById(payload.id);
+    const user = await User.findByPk(payload.id);
     if (!user) return res.status(404).json({ error: 'Usuario no encontrado' });
     res.json({ user: user.toJSON() });
   } catch {

@@ -13,6 +13,6 @@ connectDB()
     });
   })
   .catch(err => {
-    console.error('❌ No se pudo conectar a MongoDB:', err.message);
+    console.error('❌ No se pudo conectar a Azure SQL:', err.message);
     process.exit(1);
   });
